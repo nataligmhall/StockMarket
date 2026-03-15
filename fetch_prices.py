@@ -87,6 +87,124 @@ def calculate_mfi(highs, lows, closes, volumes, period=14):
     return round(100 - (100 / (1 + pos_sum / neg_sum)), 1)
 
 
+# ── Swing-trading indicator helpers ──────────────────────────────────────────
+
+def calculate_ema_series(closes, period):
+    """Full EMA series; pre-period bars are None."""
+    if len(closes) < period:
+        return [None] * len(closes)
+    k = 2 / (period + 1)
+    seed = sum(closes[:period]) / period
+    result = [None] * (period - 1) + [seed]
+    for price in closes[period:]:
+        seed = price * k + seed * (1 - k)
+        result.append(seed)
+    return result
+
+
+def calculate_macd(closes, fast=12, slow=26, signal_period=9):
+    """MACD(12,26,9). Returns (macd_val, signal_val, histogram) or (None,None,None)."""
+    if len(closes) < slow + signal_period:
+        return None, None, None
+    ema_fast = calculate_ema_series(closes, fast)
+    ema_slow = calculate_ema_series(closes, slow)
+    macd_line = [
+        (f - s if f is not None and s is not None else None)
+        for f, s in zip(ema_fast, ema_slow)
+    ]
+    macd_vals = [v for v in macd_line if v is not None]
+    if len(macd_vals) < signal_period:
+        return None, None, None
+    k = 2 / (signal_period + 1)
+    sig = sum(macd_vals[:signal_period]) / signal_period
+    for v in macd_vals[signal_period:]:
+        sig = v * k + sig * (1 - k)
+    current_macd = macd_vals[-1]
+    return round(current_macd, 4), round(sig, 4), round(current_macd - sig, 4)
+
+
+def calculate_bollinger_bands(closes, period=20):
+    """Bollinger Bands (SMA20 ± 2σ). Returns (upper, mid, lower, pct_b) or Nones."""
+    if len(closes) < period:
+        return None, None, None, None
+    window = closes[-period:]
+    mid = sum(window) / period
+    std = (sum((x - mid) ** 2 for x in window) / period) ** 0.5
+    upper = round(mid + 2 * std, 2)
+    lower = round(mid - 2 * std, 2)
+    mid   = round(mid, 2)
+    pct_b = round((closes[-1] - lower) / (upper - lower), 3) if upper != lower else 0.5
+    return upper, mid, lower, pct_b
+
+
+def generate_swing_signal(closes, rsi, mfi):
+    """
+    5-rule swing trading signal. Score range −5 to +5.
+      ≥+3 → STRONG BUY  |  +1/+2 → BUY  |  0 → HOLD
+      −1/−2 → SELL       |  ≤−3  → STRONG SELL
+    Rules: RSI zone · MFI zone · MACD histogram · Price vs SMA20 · Bollinger %B
+    """
+    score, reasons = 0, []
+
+    # Rule 1 – RSI momentum
+    if rsi is not None:
+        if rsi <= 30:
+            score += 1; reasons.append(f"RSI {rsi} → oversold, bounce candidate")
+        elif rsi >= 70:
+            score -= 1; reasons.append(f"RSI {rsi} → overbought, pullback risk")
+
+    # Rule 2 – MFI volume pressure
+    if mfi is not None:
+        if mfi <= 30:
+            score += 1; reasons.append(f"MFI {mfi} → oversold volume, buying pressure")
+        elif mfi >= 80:
+            score -= 1; reasons.append(f"MFI {mfi} → overbought volume, selling pressure")
+
+    # Rule 3 – MACD trend direction
+    macd_val, sig_val, histogram = calculate_macd(closes)
+    if histogram is not None:
+        if histogram > 0:
+            score += 1; reasons.append(f"MACD hist +{histogram:.3f} → bullish momentum")
+        else:
+            score -= 1; reasons.append(f"MACD hist {histogram:.3f} → bearish momentum")
+
+    # Rule 4 – Price vs 20-day SMA
+    sma20 = None
+    if len(closes) >= 20:
+        sma20 = round(sum(closes[-20:]) / 20, 2)
+        if closes[-1] > sma20:
+            score += 1; reasons.append(f"Price ${closes[-1]:.2f} above SMA20 ${sma20}")
+        else:
+            score -= 1; reasons.append(f"Price ${closes[-1]:.2f} below SMA20 ${sma20}")
+
+    # Rule 5 – Bollinger Band position
+    bb_upper, bb_mid, bb_lower, pct_b = calculate_bollinger_bands(closes)
+    if pct_b is not None:
+        if pct_b <= 0.2:
+            score += 1; reasons.append(f"Near lower Bollinger Band (%B {pct_b:.2f})")
+        elif pct_b >= 0.8:
+            score -= 1; reasons.append(f"Near upper Bollinger Band (%B {pct_b:.2f})")
+
+    if   score >= 3:  label = "STRONG BUY"
+    elif score >= 1:  label = "BUY"
+    elif score <= -3: label = "STRONG SELL"
+    elif score <= -1: label = "SELL"
+    else:             label = "HOLD"
+
+    return {
+        "signal":    label,
+        "score":     score,
+        "reasons":   reasons,
+        "macd":      macd_val,
+        "macd_sig":  sig_val,
+        "macd_hist": histogram,
+        "sma20":     sma20,
+        "bb_upper":  bb_upper,
+        "bb_lower":  bb_lower,
+        "bb_pct_b":  pct_b,
+    }
+
+
 # ── Price fetch ───────────────────────────────────────────────────────────────
 
 def fetch_data():
@@ -131,6 +249,9 @@ def fetch_data():
             except Exception:
                 pass
 
+            # Swing trading signal (MACD, BB, SMA20, RSI, MFI)
+            swing = generate_swing_signal(closes_full, rsi_val, mfi_val)
+
             results[symbol] = {
                 **meta,
                 "ticker":     symbol,
@@ -141,10 +262,11 @@ def fetch_data():
                 "dates":      dates,
                 "rsi":        rsi_val,
                 "mfi":        mfi_val,
+                "swing":      swing,
             }
             sign    = "+" if pct_change >= 0 else ""
             rsi_str = f"RSI {rsi_val}" if rsi_val is not None else "RSI n/a"
-            print(f"  ✓ {symbol:6s}  ${current:.2f}  ({sign}{pct_change}%)  {rsi_str}")
+            print(f"  ✓ {symbol:6s}  ${current:.2f}  ({sign}{pct_change}%)  {rsi_str}  [{swing['signal']}]")
 
         except Exception as e:
             print(f"  ✗ {symbol}: {e}")
