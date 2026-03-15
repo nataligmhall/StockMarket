@@ -67,7 +67,7 @@ Actions are already configured in `.github/workflows/daily-update.yml`.
 
 ---
 
-## Customise tickers
+## Customize tickers
 
 Edit the `TICKERS` dict in `fetch_prices.py`:
 
@@ -80,6 +80,30 @@ TICKERS = {
 ```
 
 Valid `side` values: `winner` · `loser` · `benchmark`
+
+---
+
+## Swing Trading Signal Engine
+
+Each stock is evaluated against **5 independent rules**. Each rule contributes `+1` (bullish), `−1` (bearish), or `0` (neutral) to a composite score.
+
+| Rule | BUY trigger | SELL trigger |
+|------|-------------|--------------|
+| **RSI(14)** | ≤ 30 — oversold | ≥ 70 — overbought |
+| **MFI(14)** | ≤ 30 — oversold volume | ≥ 80 — overbought volume |
+| **MACD(12/26/9) histogram** | > 0 — bullish crossover | < 0 — bearish crossover |
+| **Price vs SMA20** | price > SMA20 — uptrend | price < SMA20 — downtrend |
+| **Bollinger %B** | ≤ 0.20 — near lower band, mean-revert up | ≥ 0.80 — near upper band, mean-revert down |
+
+**Score → Signal label (range −5 to +5):**
+
+| Score | Signal |
+|-------|--------|
+| +3 to +5 | 🟢 STRONG BUY |
+| +1 to +2 | 🟩 BUY |
+| 0 | ⬜ HOLD |
+| −1 to −2 | 🟥 SELL |
+| −3 to −5 | 🔴 STRONG SELL |
 
 ---
 
