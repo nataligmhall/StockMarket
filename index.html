@@ -71,6 +71,28 @@
   .footer{border-top:1px solid var(--border2);padding-top:14px;font-size:10px;color:var(--faint);line-height:1.8;margin-top:8px}
 
   canvas{max-height:280px}
+
+  /* ── News feed ── */
+  .news-item{border-bottom:1px solid var(--border2);padding:10px 0;display:flex;flex-direction:column;gap:3px}
+  .news-item:last-child{border-bottom:none}
+  .news-source{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+  .news-title{font-size:12px;color:var(--text);line-height:1.4;text-decoration:none}
+  .news-title:hover{color:var(--cyan)}
+  .news-time{font-size:10px;color:var(--faint)}
+  .news-empty{color:#555;font-size:12px;padding:10px 0}
+
+  /* ── Technical indicators (RSI / MFI) ── */
+  .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:640px){.ind-grid{grid-template-columns:1fr}}
+  .ind-col-title{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:10px}
+  .indicator-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .ind-ticker{font-size:12px;font-weight:700;width:42px;flex-shrink:0}
+  .ind-bar-wrap{flex:1;height:14px;background:#1a1a26;border-radius:2px;overflow:hidden;position:relative}
+  .ind-bar-wrap::before{content:'';position:absolute;left:30%;top:0;width:1px;height:100%;background:#ffffff14;z-index:1}
+  .ind-bar-wrap::after {content:'';position:absolute;left:70%;top:0;width:1px;height:100%;background:#ffffff14;z-index:1}
+  .ind-bar{height:100%;transition:width .4s ease}
+  .ind-val{font-size:12px;font-weight:600;width:34px;text-align:right;flex-shrink:0}
+  .ind-zone{font-size:9px;letter-spacing:.5px;width:76px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -84,21 +106,35 @@
   "updated": "seed data — run fetch_prices.py to populate",
   "war_start": "2026-02-27",
   "stocks": {
-    "LMT":  {"name":"Lockheed Martin","sector":"Defense","side":"winner","ticker":"LMT","current":651,"baseline":578,"pct_change":12.63,"series":[578,597,608,618,635,644,651],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "RTX":  {"name":"RTX Corp","sector":"Defense","side":"winner","ticker":"RTX","current":152,"baseline":134,"pct_change":13.43,"series":[134,140,143,145,148,150,152],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "NOC":  {"name":"Northrop Grumman","sector":"Defense","side":"winner","ticker":"NOC","current":576,"baseline":512,"pct_change":12.50,"series":[512,544,551,558,567,572,576],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "XOM":  {"name":"ExxonMobil","sector":"Energy","side":"winner","ticker":"XOM","current":132,"baseline":118,"pct_change":11.86,"series":[118,123,126,128,130,131,132],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "CVX":  {"name":"Chevron","sector":"Energy","side":"winner","ticker":"CVX","current":182,"baseline":165,"pct_change":10.30,"series":[165,172,175,177,179,181,182],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "GLD":  {"name":"Gold ETF","sector":"Safe Haven","side":"winner","ticker":"GLD","current":299,"baseline":276,"pct_change":8.33,"series":[276,282,285,289,293,296,299],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "UAL":  {"name":"United Airlines","sector":"Airlines","side":"loser","ticker":"UAL","current":58,"baseline":68,"pct_change":-14.71,"series":[68,66,64,62,60,59,58],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "CCL":  {"name":"Carnival Corp","sector":"Travel","side":"loser","ticker":"CCL","current":13.5,"baseline":18,"pct_change":-25.00,"series":[18,16,15.4,14.8,14.2,13.9,13.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "AAL":  {"name":"American Airlines","sector":"Airlines","side":"loser","ticker":"AAL","current":10.5,"baseline":12.5,"pct_change":-16.00,"series":[12.5,11.8,11.3,11.0,10.8,10.6,10.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]},
-    "^GSPC":{"name":"S&P 500","sector":"Index","side":"benchmark","ticker":"^GSPC","current":5673,"baseline":5850,"pct_change":-3.02,"series":[5850,5828,5791,5760,5722,5700,5673],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"]}
+    "LMT":  {"name":"Lockheed Martin","sector":"Defense","side":"winner","ticker":"LMT","current":651,"baseline":578,"pct_change":12.63,"series":[578,597,608,618,635,644,651],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":72.4,"mfi":68.1},
+    "RTX":  {"name":"RTX Corp","sector":"Defense","side":"winner","ticker":"RTX","current":152,"baseline":134,"pct_change":13.43,"series":[134,140,143,145,148,150,152],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":70.1,"mfi":65.3},
+    "NOC":  {"name":"Northrop Grumman","sector":"Defense","side":"winner","ticker":"NOC","current":576,"baseline":512,"pct_change":12.50,"series":[512,544,551,558,567,572,576],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":68.7,"mfi":63.9},
+    "XOM":  {"name":"ExxonMobil","sector":"Energy","side":"winner","ticker":"XOM","current":132,"baseline":118,"pct_change":11.86,"series":[118,123,126,128,130,131,132],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":63.2,"mfi":60.4},
+    "CVX":  {"name":"Chevron","sector":"Energy","side":"winner","ticker":"CVX","current":182,"baseline":165,"pct_change":10.30,"series":[165,172,175,177,179,181,182],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":61.5,"mfi":58.8},
+    "GLD":  {"name":"Gold ETF","sector":"Safe Haven","side":"winner","ticker":"GLD","current":299,"baseline":276,"pct_change":8.33,"series":[276,282,285,289,293,296,299],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":58.3,"mfi":55.7},
+    "UAL":  {"name":"United Airlines","sector":"Airlines","side":"loser","ticker":"UAL","current":58,"baseline":68,"pct_change":-14.71,"series":[68,66,64,62,60,59,58],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":32.1,"mfi":35.4},
+    "CCL":  {"name":"Carnival Corp","sector":"Travel","side":"loser","ticker":"CCL","current":13.5,"baseline":18,"pct_change":-25.00,"series":[18,16,15.4,14.8,14.2,13.9,13.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":27.8,"mfi":29.5},
+    "AAL":  {"name":"American Airlines","sector":"Airlines","side":"loser","ticker":"AAL","current":10.5,"baseline":12.5,"pct_change":-16.00,"series":[12.5,11.8,11.3,11.0,10.8,10.6,10.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":30.2,"mfi":33.1},
+    "^GSPC":{"name":"S&P 500","sector":"Index","side":"benchmark","ticker":"^GSPC","current":5673,"baseline":5850,"pct_change":-3.02,"series":[5850,5828,5791,5760,5722,5700,5673],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":42.6,"mfi":44.2}
   },
   "oil": {
     "Brent": {"dates":["Feb 27","Mar 1","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"prices":[71,77,82,80,83,85,87,89],"current":89,"start":71},
     "WTI":   {"dates":["Feb 27","Mar 1","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"prices":[68,75,79,77,80,82,84,86],"current":86,"start":68}
-  }
+  },
+  "macro": {
+    "VIX":      {"current": 24.3, "unit": ""},
+    "10Y Yield":{"current": 4.68, "unit": "%"}
+  },
+  "news": [
+    {"title":"US-Israel air campaign on Iran enters third week as oil holds near $89","source":"Reuters World","url":"","time":"Sat, 14 Mar 2026 18:32"},
+    {"title":"Iran threatens Strait of Hormuz closure; shipping insurers raise premiums 400%","source":"BBC Middle East","url":"","time":"Sat, 14 Mar 2026 15:10"},
+    {"title":"Defense stocks at multi-year highs — LMT, RTX, NOC all up 12%+ since Feb 28","source":"Google News","url":"","time":"Sat, 14 Mar 2026 12:45"},
+    {"title":"Gold hits $2,890 as safe-haven demand intensifies amid Middle East conflict","source":"BBC Middle East","url":"","time":"Fri, 13 Mar 2026 20:05"},
+    {"title":"Airlines warn of $4B quarterly loss as Middle East routes remain suspended","source":"Reuters World","url":"","time":"Fri, 13 Mar 2026 16:22"},
+    {"title":"Brent crude: analysts see $100/bbl if Iran disrupts Hormuz passage","source":"Google News","url":"","time":"Fri, 13 Mar 2026 09:14"},
+    {"title":"OPEC+ emergency meeting called amid Iran war supply disruption fears","source":"Reuters World","url":"","time":"Thu, 12 Mar 2026 21:00"},
+    {"title":"US sanctions on Iranian oil exports tightened; China buyers scramble for alternatives","source":"BBC Middle East","url":"","time":"Thu, 12 Mar 2026 14:30"}
+  ]
 }
 </script>
 <!-- DATA_JSON_END -->
@@ -118,6 +154,13 @@
 
 <div class="kpi-grid" id="kpiGrid"></div>
 
+<!-- News feed -->
+<div class="card">
+  <div class="card-title">War Room · Latest Headlines</div>
+  <div class="card-sub">RSS · BBC Middle East · Reuters · Google News — filtered for Iran/oil/defense relevance</div>
+  <div id="newsList"><div class="news-empty">Loading headlines...</div></div>
+</div>
+
 <!-- Normalized performance -->
 <div class="card">
   <div class="card-title">Normalized Performance Since Strike Onset (Feb 28)</div>
@@ -131,6 +174,22 @@
   <div class="card-title">Crude Oil ($/bbl)</div>
   <div class="card-sub" id="oilSub">Hormuz shutdown threat · $100 scenario if strait closes</div>
   <canvas id="oilChart" style="max-height:200px"></canvas>
+</div>
+
+<!-- Technical signals -->
+<div class="card">
+  <div class="card-title">Technical Signals</div>
+  <div class="card-sub">RSI(14) · MFI(14) — vertical lines mark oversold(30) / overbought(70) · based on 30-day history</div>
+  <div class="ind-grid">
+    <div>
+      <div class="ind-col-title">RSI · Relative Strength Index</div>
+      <div id="rsiList"></div>
+    </div>
+    <div>
+      <div class="ind-col-title">MFI · Money Flow Index</div>
+      <div id="mfiList"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Historical -->
@@ -194,7 +253,7 @@
 <script>
 // ── Load injected data ───────────────────────────────────────────────────────
 const raw = JSON.parse(document.getElementById("dashData").textContent);
-const { stocks, oil, updated } = raw;
+const { stocks, oil, updated, macro = {}, news = [] } = raw;
 
 // ── Colour map ───────────────────────────────────────────────────────────────
 const C = {
@@ -220,13 +279,18 @@ document.getElementById("summaryLine").innerHTML =
   `LMT <span class="up">${lmt?.pct_change >= 0 ? '+' : ''}${lmt?.pct_change ?? '—'}%</span>`;
 
 // ── KPI grid ─────────────────────────────────────────────────────────────────
+const vix = macro["VIX"];
+const tny = macro["10Y Yield"];
+const vixCol = !vix ? "#555" : vix.current > 30 ? "#ff4d6d" : vix.current > 20 ? "#ffaa00" : "#00ff9d";
 const kpiDefs = [
-  { label:"Brent Crude", val:`$${brent?.current ?? '—'}/bbl`, sub:`${brentPct >= 0 ? '+' : ''}${brentPct}% since Feb 27`, col:"#ffaa00" },
-  { label:"Gold (GLD)",  val:`$${stocks.GLD?.current ?? '—'}`, sub:`${stocks.GLD?.pct_change >= 0 ? '+' : ''}${stocks.GLD?.pct_change ?? '—'}% since war start`, col:"#ffd700" },
-  { label:"S&P 500",     val:`${sp?.pct_change >= 0 ? '+' : ''}${sp?.pct_change ?? '—'}%`, sub:`from ${sp?.baseline?.toLocaleString() ?? '—'} baseline`, col:sp?.pct_change >= 0 ? "#00ff9d" : "#ff4d6d" },
-  { label:"Best Defense",val:`${lmt?.pct_change >= 0 ? '+' : ''}${lmt?.pct_change ?? '—'}%`, sub:"LMT since Feb 27", col:"#00ff9d" },
-  { label:"WTI Crude",   val:`$${oil.WTI?.current ?? '—'}/bbl`, sub:`+${(((oil.WTI?.current - oil.WTI?.start)/oil.WTI?.start)*100).toFixed(1)}%`, col:"#ff7700" },
-  { label:"Data updated",val:"Daily", sub:updated.split(" ")[0] ?? "—", col:"#00d4ff" },
+  { label:"Brent Crude",   val:`$${brent?.current ?? '—'}/bbl`, sub:`${brentPct >= 0 ? '+' : ''}${brentPct}% since Feb 27`, col:"#ffaa00" },
+  { label:"Gold (GLD)",    val:`$${stocks.GLD?.current ?? '—'}`, sub:`${stocks.GLD?.pct_change >= 0 ? '+' : ''}${stocks.GLD?.pct_change ?? '—'}% since war start`, col:"#ffd700" },
+  { label:"S&P 500",       val:`${sp?.pct_change >= 0 ? '+' : ''}${sp?.pct_change ?? '—'}%`, sub:`from ${sp?.baseline?.toLocaleString() ?? '—'} baseline`, col:sp?.pct_change >= 0 ? "#00ff9d" : "#ff4d6d" },
+  { label:"Best Defense",  val:`${lmt?.pct_change >= 0 ? '+' : ''}${lmt?.pct_change ?? '—'}%`, sub:"LMT since Feb 27", col:"#00ff9d" },
+  { label:"WTI Crude",     val:`$${oil.WTI?.current ?? '—'}/bbl`, sub:`+${(((oil.WTI?.current - oil.WTI?.start)/oil.WTI?.start)*100).toFixed(1)}%`, col:"#ff7700" },
+  { label:"VIX Fear Index",val:vix ? vix.current.toFixed(1) : "—", sub: !vix ? "—" : vix.current > 30 ? "High fear" : vix.current > 20 ? "Moderate" : "Low volatility", col:vixCol },
+  { label:"10Y Yield",     val:tny ? `${tny.current}%` : "—", sub:"US Treasury · risk-off signal", col:"#00d4ff" },
+  { label:"Data updated",  val:"Daily", sub:updated.split(" ")[0] ?? "—", col:"#888" },
 ];
 document.getElementById("kpiGrid").innerHTML = kpiDefs.map(k =>
   `<div class="kpi">
@@ -376,6 +440,66 @@ function renderStocks(containerId, side, textColor) {
 }
 renderStocks("winnersList", "winner", "#00ff9d");
 renderStocks("losersList",  "loser",  "#ff4d6d");
+
+// ── News feed ─────────────────────────────────────────────────────────────────
+const srcColors = {
+  "BBC Middle East": "#ff4444",
+  "Reuters World":   "#ff8800",
+  "Google News":     "#4488ff",
+};
+const newsList = document.getElementById("newsList");
+if (news && news.length) {
+  newsList.innerHTML = news.map(n => {
+    const col = srcColors[n.source] || "#888";
+    const href = n.url ? `href="${n.url}" target="_blank" rel="noopener"` : "";
+    return `<div class="news-item">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="news-source" style="color:${col}">${n.source}</span>
+        <span class="news-time">${n.time}</span>
+      </div>
+      <a ${href} class="news-title">${n.title}</a>
+    </div>`;
+  }).join("");
+} else {
+  newsList.innerHTML = '<div class="news-empty">No headlines — run fetch_prices.py to populate</div>';
+}
+
+// ── Technical signals (RSI + MFI) ────────────────────────────────────────────
+const indTickers = ["LMT","RTX","NOC","XOM","CVX","GLD","UAL","CCL","^GSPC"];
+
+function indColor(v) {
+  if (v >= 70) return "#ff4d6d";
+  if (v >= 55) return "#ffaa00";
+  if (v <= 30) return "#00ff9d";
+  return "#888888";
+}
+
+function renderIndicators(containerId, field) {
+  document.getElementById(containerId).innerHTML = indTickers.map(sym => {
+    const s = stocks[sym];
+    if (!s) return "";
+    const val = s[field];
+    const col = val != null ? indColor(val) : "#444";
+    const pct = val != null ? Math.min(val, 100) : 0;
+    const zone = val == null ? "n/a"
+      : val >= 70 ? "OVERBOUGHT"
+      : val <= 30 ? "OVERSOLD"
+      : "NEUTRAL";
+    const display = val != null ? val.toFixed(1) : "—";
+    const label   = sym === "^GSPC" ? "SPX" : sym;
+    return `<div class="indicator-row">
+      <span class="ind-ticker" style="color:${color(sym)}">${label}</span>
+      <div class="ind-bar-wrap">
+        <div class="ind-bar" style="width:${pct}%;background:${col}28;border-right:2px solid ${col}"></div>
+      </div>
+      <span class="ind-val" style="color:${col}">${display}</span>
+      <span class="ind-zone" style="color:${col}aa">${zone}</span>
+    </div>`;
+  }).join("");
+}
+
+renderIndicators("rsiList", "rsi");
+renderIndicators("mfiList", "mfi");
 </script>
 </body>
 </html>
