@@ -81,6 +81,16 @@
   .news-time{font-size:10px;color:var(--faint)}
   .news-empty{color:#555;font-size:12px;padding:10px 0}
 
+  /* ── Swing trading signals ── */
+  .swing-row{display:grid;grid-template-columns:52px 116px 44px 1fr;align-items:start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border2)}
+  .swing-row:last-child{border-bottom:none}
+  .signal-badge{display:inline-block;padding:2px 9px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:1.5px;white-space:nowrap}
+  .swing-score{font-size:13px;font-weight:700;text-align:center;padding-top:2px}
+  .swing-reasons{font-size:10px;color:var(--faint);line-height:1.8}
+  .swing-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;font-size:10px;color:var(--faint)}
+  .swing-legend span{display:inline-flex;align-items:center;gap:5px}
+  .leg-dot{display:inline-block;width:8px;height:8px;border-radius:2px}
+
   /* ── Technical indicators (RSI / MFI) ── */
   .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   @media(max-width:640px){.ind-grid{grid-template-columns:1fr}}
@@ -106,16 +116,26 @@
   "updated": "seed data — run fetch_prices.py to populate",
   "war_start": "2026-02-27",
   "stocks": {
-    "LMT":  {"name":"Lockheed Martin","sector":"Defense","side":"winner","ticker":"LMT","current":651,"baseline":578,"pct_change":12.63,"series":[578,597,608,618,635,644,651],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":72.4,"mfi":68.1},
-    "RTX":  {"name":"RTX Corp","sector":"Defense","side":"winner","ticker":"RTX","current":152,"baseline":134,"pct_change":13.43,"series":[134,140,143,145,148,150,152],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":70.1,"mfi":65.3},
-    "NOC":  {"name":"Northrop Grumman","sector":"Defense","side":"winner","ticker":"NOC","current":576,"baseline":512,"pct_change":12.50,"series":[512,544,551,558,567,572,576],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":68.7,"mfi":63.9},
-    "XOM":  {"name":"ExxonMobil","sector":"Energy","side":"winner","ticker":"XOM","current":132,"baseline":118,"pct_change":11.86,"series":[118,123,126,128,130,131,132],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":63.2,"mfi":60.4},
-    "CVX":  {"name":"Chevron","sector":"Energy","side":"winner","ticker":"CVX","current":182,"baseline":165,"pct_change":10.30,"series":[165,172,175,177,179,181,182],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":61.5,"mfi":58.8},
-    "GLD":  {"name":"Gold ETF","sector":"Safe Haven","side":"winner","ticker":"GLD","current":299,"baseline":276,"pct_change":8.33,"series":[276,282,285,289,293,296,299],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":58.3,"mfi":55.7},
-    "UAL":  {"name":"United Airlines","sector":"Airlines","side":"loser","ticker":"UAL","current":58,"baseline":68,"pct_change":-14.71,"series":[68,66,64,62,60,59,58],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":32.1,"mfi":35.4},
-    "CCL":  {"name":"Carnival Corp","sector":"Travel","side":"loser","ticker":"CCL","current":13.5,"baseline":18,"pct_change":-25.00,"series":[18,16,15.4,14.8,14.2,13.9,13.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":27.8,"mfi":29.5},
-    "AAL":  {"name":"American Airlines","sector":"Airlines","side":"loser","ticker":"AAL","current":10.5,"baseline":12.5,"pct_change":-16.00,"series":[12.5,11.8,11.3,11.0,10.8,10.6,10.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":30.2,"mfi":33.1},
-    "^GSPC":{"name":"S&P 500","sector":"Index","side":"benchmark","ticker":"^GSPC","current":5673,"baseline":5850,"pct_change":-3.02,"series":[5850,5828,5791,5760,5722,5700,5673],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":42.6,"mfi":44.2}
+    "LMT":  {"name":"Lockheed Martin","sector":"Defense","side":"winner","ticker":"LMT","current":651,"baseline":578,"pct_change":12.63,"series":[578,597,608,618,635,644,651],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":72.4,"mfi":68.1,
+      "swing":{"signal":"HOLD","score":0,"reasons":["RSI 72.4 → overbought, pullback risk","MACD hist +0.412 → bullish momentum","Price $651.00 above SMA20 $628.14","Near upper Bollinger Band (%B 0.87)"],"macd":1.832,"macd_sig":1.420,"macd_hist":0.412,"sma20":628.14,"bb_upper":663.20,"bb_lower":592.08,"bb_pct_b":0.87}},
+    "RTX":  {"name":"RTX Corp","sector":"Defense","side":"winner","ticker":"RTX","current":152,"baseline":134,"pct_change":13.43,"series":[134,140,143,145,148,150,152],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":70.1,"mfi":65.3,
+      "swing":{"signal":"HOLD","score":0,"reasons":["RSI 70.1 → overbought, pullback risk","MACD hist +0.187 → bullish momentum","Price $152.00 above SMA20 $145.80","Near upper Bollinger Band (%B 0.82)"],"macd":0.741,"macd_sig":0.554,"macd_hist":0.187,"sma20":145.80,"bb_upper":155.62,"bb_lower":136.08,"bb_pct_b":0.82}},
+    "NOC":  {"name":"Northrop Grumman","sector":"Defense","side":"winner","ticker":"NOC","current":576,"baseline":512,"pct_change":12.50,"series":[512,544,551,558,567,572,576],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":68.7,"mfi":63.9,
+      "swing":{"signal":"BUY","score":2,"reasons":["MACD hist +0.331 → bullish momentum","Price $576.00 above SMA20 $556.43"],"macd":1.214,"macd_sig":0.883,"macd_hist":0.331,"sma20":556.43,"bb_upper":584.10,"bb_lower":528.76,"bb_pct_b":0.85}},
+    "XOM":  {"name":"ExxonMobil","sector":"Energy","side":"winner","ticker":"XOM","current":132,"baseline":118,"pct_change":11.86,"series":[118,123,126,128,130,131,132],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":63.2,"mfi":60.4,
+      "swing":{"signal":"BUY","score":2,"reasons":["MACD hist +0.203 → bullish momentum","Price $132.00 above SMA20 $127.29"],"macd":0.624,"macd_sig":0.421,"macd_hist":0.203,"sma20":127.29,"bb_upper":134.88,"bb_lower":119.70,"bb_pct_b":0.79}},
+    "CVX":  {"name":"Chevron","sector":"Energy","side":"winner","ticker":"CVX","current":182,"baseline":165,"pct_change":10.30,"series":[165,172,175,177,179,181,182],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":61.5,"mfi":58.8,
+      "swing":{"signal":"BUY","score":2,"reasons":["MACD hist +0.271 → bullish momentum","Price $182.00 above SMA20 $175.43"],"macd":0.842,"macd_sig":0.571,"macd_hist":0.271,"sma20":175.43,"bb_upper":185.60,"bb_lower":165.26,"bb_pct_b":0.82}},
+    "GLD":  {"name":"Gold ETF","sector":"Safe Haven","side":"winner","ticker":"GLD","current":299,"baseline":276,"pct_change":8.33,"series":[276,282,285,289,293,296,299],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":58.3,"mfi":55.7,
+      "swing":{"signal":"BUY","score":2,"reasons":["MACD hist +0.318 → bullish momentum","Price $299.00 above SMA20 $288.57"],"macd":1.106,"macd_sig":0.788,"macd_hist":0.318,"sma20":288.57,"bb_upper":305.14,"bb_lower":272.00,"bb_pct_b":0.82}},
+    "UAL":  {"name":"United Airlines","sector":"Airlines","side":"loser","ticker":"UAL","current":58,"baseline":68,"pct_change":-14.71,"series":[68,66,64,62,60,59,58],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":32.1,"mfi":35.4,
+      "swing":{"signal":"SELL","score":-2,"reasons":["MACD hist -0.224 → bearish momentum","Price $58.00 below SMA20 $62.43"],"macd":-0.711,"macd_sig":-0.487,"macd_hist":-0.224,"sma20":62.43,"bb_upper":69.84,"bb_lower":55.02,"bb_pct_b":0.20}},
+    "CCL":  {"name":"Carnival Corp","sector":"Travel","side":"loser","ticker":"CCL","current":13.5,"baseline":18,"pct_change":-25.00,"series":[18,16,15.4,14.8,14.2,13.9,13.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":27.8,"mfi":29.5,
+      "swing":{"signal":"BUY","score":1,"reasons":["RSI 27.8 → oversold, bounce candidate","MFI 29.5 → oversold volume, buying pressure","MACD hist -0.041 → bearish momentum","Price $13.50 below SMA20 $14.97","Near lower Bollinger Band (%B 0.08)"],"macd":-0.186,"macd_sig":-0.145,"macd_hist":-0.041,"sma20":14.97,"bb_upper":17.42,"bb_lower":12.52,"bb_pct_b":0.08}},
+    "AAL":  {"name":"American Airlines","sector":"Airlines","side":"loser","ticker":"AAL","current":10.5,"baseline":12.5,"pct_change":-16.00,"series":[12.5,11.8,11.3,11.0,10.8,10.6,10.5],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":30.2,"mfi":33.1,
+      "swing":{"signal":"SELL","score":-1,"reasons":["MACD hist -0.097 → bearish momentum","Price $10.50 below SMA20 $11.21","Near lower Bollinger Band (%B 0.17)"],"macd":-0.312,"macd_sig":-0.215,"macd_hist":-0.097,"sma20":11.21,"bb_upper":12.86,"bb_lower":9.56,"bb_pct_b":0.17}},
+    "^GSPC":{"name":"S&P 500","sector":"Index","side":"benchmark","ticker":"^GSPC","current":5673,"baseline":5850,"pct_change":-3.02,"series":[5850,5828,5791,5760,5722,5700,5673],"dates":["Feb 27","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"rsi":42.6,"mfi":44.2,
+      "swing":{"signal":"SELL","score":-2,"reasons":["MACD hist -12.440 → bearish momentum","Price $5673.00 below SMA20 $5760.57"],"macd":-38.14,"macd_sig":-25.70,"macd_hist":-12.44,"sma20":5760.57,"bb_upper":5886.42,"bb_lower":5634.72,"bb_pct_b":0.24}}
   },
   "oil": {
     "Brent": {"dates":["Feb 27","Mar 1","Mar 2","Mar 4","Mar 7","Mar 10","Mar 12","Mar 15"],"prices":[71,77,82,80,83,85,87,89],"current":89,"start":71},
@@ -190,6 +210,20 @@
       <div id="mfiList"></div>
     </div>
   </div>
+</div>
+
+<!-- Swing trading signals -->
+<div class="card">
+  <div class="card-title">Swing Trading Signals</div>
+  <div class="card-sub">5-factor model · RSI(14) · MFI(14) · MACD(12/26/9) · 20-day SMA · Bollinger Bands(20,2σ) · Score −5 to +5 · Not financial advice</div>
+  <div class="swing-legend">
+    <span><span class="leg-dot" style="background:#00ff9d"></span>STRONG BUY (≥+3)</span>
+    <span><span class="leg-dot" style="background:#00ff9d88"></span>BUY (+1/+2)</span>
+    <span><span class="leg-dot" style="background:#888"></span>HOLD (0)</span>
+    <span><span class="leg-dot" style="background:#ff4d6d88"></span>SELL (−1/−2)</span>
+    <span><span class="leg-dot" style="background:#ff4d6d"></span>STRONG SELL (≤−3)</span>
+  </div>
+  <div id="swingSignalList"></div>
 </div>
 
 <!-- Historical -->
@@ -500,6 +534,55 @@ function renderIndicators(containerId, field) {
 
 renderIndicators("rsiList", "rsi");
 renderIndicators("mfiList", "mfi");
+
+// ── Swing Trading Signals ─────────────────────────────────────────────────────
+function swingStyle(sig) {
+  switch (sig) {
+    case "STRONG BUY":  return { bg:"#00ff9d22", border:"#00ff9d",   text:"#00ff9d" };
+    case "BUY":         return { bg:"#00ff9d11", border:"#00ff9d77", text:"#00aa66" };
+    case "HOLD":        return { bg:"#88888822", border:"#888888",   text:"#888888" };
+    case "SELL":        return { bg:"#ff4d6d11", border:"#ff4d6d77", text:"#cc3355" };
+    case "STRONG SELL": return { bg:"#ff4d6d22", border:"#ff4d6d",   text:"#ff4d6d" };
+    default:            return { bg:"#55555522", border:"#555",       text:"#555"   };
+  }
+}
+
+const swingTickers = ["LMT","RTX","NOC","XOM","CVX","GLD","UAL","AAL","DAL","CCL","^GSPC"];
+const swingEl = document.getElementById("swingSignalList");
+if (swingEl) {
+  const rows = swingTickers
+    .filter(t => stocks[t]?.swing)
+    .map(t => {
+      const s  = stocks[t];
+      const sw = s.swing;
+      const st = swingStyle(sw.signal);
+      const label     = t === "^GSPC" ? "SPX" : t;
+      const scoreStr  = sw.score > 0 ? `+${sw.score}` : `${sw.score}`;
+      const macroLine = [
+        sw.sma20     != null ? `SMA20 $${sw.sma20}` : null,
+        sw.bb_pct_b  != null ? `%B ${(sw.bb_pct_b * 100).toFixed(0)}%` : null,
+        sw.macd_hist != null ? `MACD hist ${sw.macd_hist > 0 ? "+" : ""}${sw.macd_hist.toFixed(3)}` : null,
+      ].filter(Boolean).join(" · ");
+
+      const reasonHtml = (sw.reasons || [])
+        .map(r => `<span style="color:#555">·</span> ${r}`)
+        .join("<br>");
+
+      return `<div class="swing-row">
+        <span style="color:${color(t)};font-size:13px;font-weight:700;padding-top:3px">${label}</span>
+        <span class="signal-badge" style="background:${st.bg};border:1px solid ${st.border};color:${st.text};margin-top:2px">${sw.signal}</span>
+        <span class="swing-score" style="color:${st.text}">${scoreStr}</span>
+        <div class="swing-reasons">
+          ${macroLine ? `<span style="color:#666;font-size:10px">${macroLine}</span><br>` : ""}
+          ${reasonHtml}
+        </div>
+      </div>`;
+    });
+
+  swingEl.innerHTML = rows.length
+    ? rows.join("")
+    : '<div style="color:#555;font-size:12px;padding:10px 0">No signal data — run fetch_prices.py to populate</div>';
+}
 </script>
 </body>
 </html>
