@@ -6,6 +6,7 @@ Rewrites the DATA_JSON block inside index.html, then commits via git.
 Run daily via GitHub Actions.
 """
 
+import email.utils
 import json
 import re
 import sys
@@ -137,12 +138,61 @@ def calculate_bollinger_bands(closes, period=20):
     return upper, mid, lower, pct_b
 
 
-def generate_swing_signal(closes, rsi, mfi):
+def calculate_atr(highs, lows, closes, period=14):
+    """14-period Average True Range using Wilder's smoothing."""
+    if len(closes) < period + 1:
+        return None
+    true_ranges = [
+        max(highs[i] - lows[i],
+            abs(highs[i] - closes[i - 1]),
+            abs(lows[i]  - closes[i - 1]))
+        for i in range(1, len(closes))
+    ]
+    if len(true_ranges) < period:
+        return None
+    atr = sum(true_ranges[:period]) / period
+    for tr in true_ranges[period:]:
+        atr = (atr * (period - 1) + tr) / period
+    return round(atr, 4)
+
+
+def calculate_stochastic(highs, lows, closes, k_period=14, d_period=3):
+    """Fast Stochastic Oscillator (%K, %D). Returns (k, d) or (None, None)."""
+    n = len(closes)
+    if n < k_period + d_period:
+        return None, None
+    k_vals = []
+    for i in range(k_period - 1, n):
+        hh = max(highs[i - k_period + 1: i + 1])
+        ll = min(lows[i  - k_period + 1: i + 1])
+        k_vals.append(50.0 if hh == ll else round((closes[i] - ll) / (hh - ll) * 100, 2))
+    if len(k_vals) < d_period:
+        return None, None
+    d = round(sum(k_vals[-d_period:]) / d_period, 2)
+    return round(k_vals[-1], 2), d
+
+
+def calculate_volume_surge(volumes, closes, period=20):
     """
-    5-rule swing trading signal. Score range −5 to +5.
-      ≥+3 → STRONG BUY  |  +1/+2 → BUY  |  0 → HOLD
-      −1/−2 → SELL       |  ≤−3  → STRONG SELL
-    Rules: RSI zone · MFI zone · MACD histogram · Price vs SMA20 · Bollinger %B
+    Volume surge check. Returns +1 if bullish surge, -1 if bearish, 0 otherwise.
+    A surge is current volume > 1.5x the period-day average (excluding today).
+    """
+    if len(volumes) < period + 1 or len(closes) < 2:
+        return 0
+    avg = sum(volumes[-(period + 1):-1]) / period
+    if avg <= 0:
+        return 0
+    if volumes[-1] / avg > 1.5:
+        return 1 if closes[-1] >= closes[-2] else -1
+    return 0
+
+
+def generate_swing_signal(closes, highs, lows, volumes, rsi, mfi):
+    """
+    7-factor swing trading signal. Score range −7 to +7.
+      ≥+4 → STRONG BUY  |  +2/+3 → BUY  |  −1 to +1 → HOLD
+      −2/−3 → SELL       |  ≤−4   → STRONG SELL
+    Factors: RSI · MFI · MACD · SMA20 · Bollinger %B · Stochastic · Volume surge
     """
     score, reasons = 0, []
 
@@ -185,10 +235,30 @@ def generate_swing_signal(closes, rsi, mfi):
         elif pct_b >= 0.8:
             score -= 1; reasons.append(f"Near upper Bollinger Band (%B {pct_b:.2f})")
 
-    if   score >= 3:  label = "STRONG BUY"
-    elif score >= 1:  label = "BUY"
-    elif score <= -3: label = "STRONG SELL"
-    elif score <= -1: label = "SELL"
+    # Rule 6 – Stochastic momentum/timing
+    stoch_k, stoch_d = calculate_stochastic(highs, lows, closes)
+    if stoch_k is not None:
+        if stoch_k <= 20:
+            score += 1; reasons.append(f"Stoch %K {stoch_k:.1f} → oversold zone")
+        elif stoch_k >= 80:
+            score -= 1; reasons.append(f"Stoch %K {stoch_k:.1f} → overbought zone")
+        elif stoch_d is not None:
+            if stoch_k > stoch_d:
+                score += 1; reasons.append(f"Stoch %K {stoch_k:.1f} > %D {stoch_d:.1f} → bullish crossover")
+            elif stoch_k < stoch_d:
+                score -= 1; reasons.append(f"Stoch %K {stoch_k:.1f} < %D {stoch_d:.1f} → bearish crossover")
+
+    # Rule 7 – Volume surge confirmation
+    vol_surge = calculate_volume_surge(volumes, closes)
+    if vol_surge == 1:
+        score += 1; reasons.append("Volume surge confirms bullish move (>1.5× avg)")
+    elif vol_surge == -1:
+        score -= 1; reasons.append("Volume surge confirms bearish move (>1.5× avg)")
+
+    if   score >= 4:  label = "STRONG BUY"
+    elif score >= 2:  label = "BUY"
+    elif score <= -4: label = "STRONG SELL"
+    elif score <= -2: label = "SELL"
     else:             label = "HOLD"
 
     return {
@@ -202,6 +272,8 @@ def generate_swing_signal(closes, rsi, mfi):
         "bb_upper":  bb_upper,
         "bb_lower":  bb_lower,
         "bb_pct_b":  pct_b,
+        "stoch_k":   stoch_k,
+        "stoch_d":   stoch_d,
     }
 
 
@@ -235,22 +307,24 @@ def fetch_data():
             series     = [round(float(v), 2) for v in closes_w.tolist()[-20:]]
             dates      = [d.strftime("%b %d") for d in closes_w.index.tolist()[-20:]]
 
-            # RSI from full history (pre-war lookback for accurate priming)
-            closes_full = hist_full["Close"].dropna().tolist()
+            # Full OHLCV history for all indicators (pre-war lookback for accurate priming)
+            closes_full  = hist_full["Close"].dropna().tolist()
+            highs_full   = hist_full["High"].dropna().tolist()
+            lows_full    = hist_full["Low"].dropna().tolist()
+            volumes_full = hist_full["Volume"].dropna().tolist()
+
             rsi_val = calculate_rsi(closes_full)
 
-            # MFI from full history
-            mfi_val = None
+            mfi_val = atr_val = stoch_k = stoch_d = None
             try:
-                highs   = hist_full["High"].dropna().tolist()
-                lows    = hist_full["Low"].dropna().tolist()
-                volumes = hist_full["Volume"].dropna().tolist()
-                mfi_val = calculate_mfi(highs, lows, closes_full, volumes)
+                mfi_val         = calculate_mfi(highs_full, lows_full, closes_full, volumes_full)
+                atr_val         = calculate_atr(highs_full, lows_full, closes_full)
+                stoch_k, stoch_d = calculate_stochastic(highs_full, lows_full, closes_full)
             except Exception:
                 pass
 
-            # Swing trading signal (MACD, BB, SMA20, RSI, MFI)
-            swing = generate_swing_signal(closes_full, rsi_val, mfi_val)
+            # Swing trading signal (7-factor: RSI · MFI · MACD · SMA20 · BB · Stochastic · Volume)
+            swing = generate_swing_signal(closes_full, highs_full, lows_full, volumes_full, rsi_val, mfi_val)
 
             results[symbol] = {
                 **meta,
@@ -262,11 +336,15 @@ def fetch_data():
                 "dates":      dates,
                 "rsi":        rsi_val,
                 "mfi":        mfi_val,
+                "atr":        atr_val,
+                "stoch_k":    stoch_k,
+                "stoch_d":    stoch_d,
                 "swing":      swing,
             }
             sign    = "+" if pct_change >= 0 else ""
             rsi_str = f"RSI {rsi_val}" if rsi_val is not None else "RSI n/a"
-            print(f"  ✓ {symbol:6s}  ${current:.2f}  ({sign}{pct_change}%)  {rsi_str}  [{swing['signal']}]")
+            sk_str  = f"Stoch {stoch_k:.0f}" if stoch_k is not None else "Stoch n/a"
+            print(f"  ✓ {symbol:6s}  ${current:.2f}  ({sign}{pct_change}%)  {rsi_str}  {sk_str}  [{swing['signal']}]")
 
         except Exception as e:
             print(f"  ✗ {symbol}: {e}")
@@ -353,7 +431,8 @@ def fetch_news():
                     continue
 
                 try:
-                    dt = datetime.strptime(pub[:25], "%a, %d %b %Y %H:%M:%S")
+                    parsed = email.utils.parsedate(pub)
+                    dt = datetime(*parsed[:6]) if parsed else datetime.utcnow()
                 except Exception:
                     dt = datetime.utcnow()
 

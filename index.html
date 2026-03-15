@@ -91,9 +91,13 @@
   .swing-legend span{display:inline-flex;align-items:center;gap:5px}
   .leg-dot{display:inline-block;width:8px;height:8px;border-radius:2px}
 
-  /* ── Technical indicators (RSI / MFI) ── */
-  .ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  /* ── Technical indicators (RSI / MFI / Stochastic) ── */
+  .ind-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+  @media(max-width:900px){.ind-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:640px){.ind-grid{grid-template-columns:1fr}}
+  /* Stochastic uses 20/80 thresholds instead of RSI's 30/70 */
+  .ind-bar-stoch::before{content:'';position:absolute;left:20%;top:0;width:1px;height:100%;background:#ffffff14;z-index:1}
+  .ind-bar-stoch::after {content:'';position:absolute;left:80%;top:0;width:1px;height:100%;background:#ffffff14;z-index:1}
   .ind-col-title{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:10px}
   .indicator-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
   .ind-ticker{font-size:12px;font-weight:700;width:42px;flex-shrink:0}
@@ -199,7 +203,7 @@
 <!-- Technical signals -->
 <div class="card">
   <div class="card-title">Technical Signals</div>
-  <div class="card-sub">RSI(14) · MFI(14) — vertical lines mark oversold(30) / overbought(70) · based on 30-day history</div>
+  <div class="card-sub">RSI(14) · MFI(14) · Stochastic %K/%D(14,3) — lines mark oversold / overbought thresholds · based on 30-day history</div>
   <div class="ind-grid">
     <div>
       <div class="ind-col-title">RSI · Relative Strength Index</div>
@@ -209,19 +213,23 @@
       <div class="ind-col-title">MFI · Money Flow Index</div>
       <div id="mfiList"></div>
     </div>
+    <div>
+      <div class="ind-col-title">Stochastic %K/%D · 14,3</div>
+      <div id="stochList"></div>
+    </div>
   </div>
 </div>
 
 <!-- Swing trading signals -->
 <div class="card">
   <div class="card-title">Swing Trading Signals</div>
-  <div class="card-sub">5-factor model · RSI(14) · MFI(14) · MACD(12/26/9) · 20-day SMA · Bollinger Bands(20,2σ) · Score −5 to +5 · Not financial advice</div>
+  <div class="card-sub">7-factor model · RSI(14) · MFI(14) · MACD(12/26/9) · 20-day SMA · Bollinger Bands(20,2σ) · Stochastic(14,3) · Volume surge · Score −7 to +7 · Not financial advice</div>
   <div class="swing-legend">
-    <span><span class="leg-dot" style="background:#00ff9d"></span>STRONG BUY (≥+3)</span>
-    <span><span class="leg-dot" style="background:#00ff9d88"></span>BUY (+1/+2)</span>
-    <span><span class="leg-dot" style="background:#888"></span>HOLD (0)</span>
-    <span><span class="leg-dot" style="background:#ff4d6d88"></span>SELL (−1/−2)</span>
-    <span><span class="leg-dot" style="background:#ff4d6d"></span>STRONG SELL (≤−3)</span>
+    <span><span class="leg-dot" style="background:#00ff9d"></span>STRONG BUY (≥+4)</span>
+    <span><span class="leg-dot" style="background:#00ff9d88"></span>BUY (+2/+3)</span>
+    <span><span class="leg-dot" style="background:#888"></span>HOLD (−1 to +1)</span>
+    <span><span class="leg-dot" style="background:#ff4d6d88"></span>SELL (−2/−3)</span>
+    <span><span class="leg-dot" style="background:#ff4d6d"></span>STRONG SELL (≤−4)</span>
   </div>
   <div id="swingSignalList"></div>
 </div>
@@ -402,6 +410,9 @@ perfDatasets.forEach((ds, i) => {
 if (oil.Brent && oil.WTI) {
   document.getElementById("oilSub").textContent =
     `Brent $${oil.Brent.current}/bbl · WTI $${oil.WTI.current}/bbl · Hormuz shutdown threat · $100 scenario if strait closes`;
+  const allOilPrices = [...(oil.Brent.prices ?? []), ...(oil.WTI.prices ?? [])];
+  const oilYMin = allOilPrices.length ? Math.floor(Math.min(...allOilPrices) * 0.95) : 55;
+  const oilYMax = allOilPrices.length ? Math.ceil(Math.max(...allOilPrices) * 1.05) : 130;
   new Chart(document.getElementById("oilChart"), {
     type:"line",
     data:{
@@ -421,7 +432,7 @@ if (oil.Brent && oil.WTI) {
       scales:{
         x:{grid:{color:"#1a1a26"},ticks:{color:"#666",font:{family:"JetBrains Mono",size:11}}},
         y:{
-          min:60, max:115,
+          min:oilYMin, max:oilYMax,
           grid:{color:"#1a1a26"},
           ticks:{color:"#666",font:{family:"JetBrains Mono",size:11},callback: v => `$${v}`}
         }
@@ -498,13 +509,20 @@ if (news && news.length) {
   newsList.innerHTML = '<div class="news-empty">No headlines — run fetch_prices.py to populate</div>';
 }
 
-// ── Technical signals (RSI + MFI) ────────────────────────────────────────────
-const indTickers = ["LMT","RTX","NOC","XOM","CVX","GLD","UAL","CCL","^GSPC"];
+// ── Technical signals (RSI + MFI + Stochastic) ───────────────────────────────
+const indTickers = ["LMT","RTX","NOC","XOM","CVX","COP","LNG","GLD","UAL","AAL","DAL","CCL","^GSPC"];
 
 function indColor(v) {
   if (v >= 70) return "#ff4d6d";
   if (v >= 55) return "#ffaa00";
   if (v <= 30) return "#00ff9d";
+  return "#888888";
+}
+
+function stochColor(v) {
+  if (v >= 80) return "#ff4d6d";
+  if (v >= 60) return "#ffaa00";
+  if (v <= 20) return "#00ff9d";
   return "#888888";
 }
 
@@ -532,8 +550,35 @@ function renderIndicators(containerId, field) {
   }).join("");
 }
 
+function renderStochastic(containerId) {
+  document.getElementById(containerId).innerHTML = indTickers.map(sym => {
+    const s = stocks[sym];
+    if (!s) return "";
+    const k = s.stoch_k, d = s.stoch_d;
+    const col = k != null ? stochColor(k) : "#444";
+    const pct = k != null ? Math.min(k, 100) : 0;
+    const zone = k == null ? "n/a"
+      : k >= 80 ? "OVERBOUGHT"
+      : k <= 20 ? "OVERSOLD"
+      : (d != null && k > d) ? "BULLISH"
+      : (d != null && k < d) ? "BEARISH"
+      : "NEUTRAL";
+    const display = k != null ? k.toFixed(1) : "—";
+    const label   = sym === "^GSPC" ? "SPX" : sym;
+    return `<div class="indicator-row">
+      <span class="ind-ticker" style="color:${color(sym)}">${label}</span>
+      <div class="ind-bar-wrap ind-bar-stoch">
+        <div class="ind-bar" style="width:${pct}%;background:${col}28;border-right:2px solid ${col}"></div>
+      </div>
+      <span class="ind-val" style="color:${col}">${display}</span>
+      <span class="ind-zone" style="color:${col}aa">${zone}</span>
+    </div>`;
+  }).join("");
+}
+
 renderIndicators("rsiList", "rsi");
 renderIndicators("mfiList", "mfi");
+renderStochastic("stochList");
 
 // ── Swing Trading Signals ─────────────────────────────────────────────────────
 function swingStyle(sig) {
@@ -547,7 +592,7 @@ function swingStyle(sig) {
   }
 }
 
-const swingTickers = ["LMT","RTX","NOC","XOM","CVX","GLD","UAL","AAL","DAL","CCL","^GSPC"];
+const swingTickers = ["LMT","RTX","NOC","XOM","CVX","COP","LNG","GLD","UAL","AAL","DAL","CCL","^GSPC"];
 const swingEl = document.getElementById("swingSignalList");
 if (swingEl) {
   const rows = swingTickers
