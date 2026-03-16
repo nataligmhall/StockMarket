@@ -108,7 +108,7 @@
 <body>
 
 <!-- ═══════════════════════════════════════════════════════════
-     DATA INJECTION ZONE — rewritten daily by fetch_prices.py
+     DATA INJECTION ZONE — rewritten every 15 min by fetch_prices.py
      ═══════════════════════════════════════════════════════════ -->
 <!-- DATA_JSON_START -->
 <script id="dashData" type="application/json">
@@ -164,7 +164,7 @@
 <div class="header">
   <div>
     <span class="tag">⚡ CONFLICT TRACKER</span>
-    <span class="meta">Operation Epic Fury · auto-updates daily</span>
+    <span class="meta">Operation Epic Fury · auto-updates every 15 min</span>
   </div>
   <h1>Market Impact Dashboard</h1>
   <p class="subtitle" id="summaryLine">Loading...</p>
@@ -279,7 +279,7 @@
 
 <div class="footer">
   Data source: <a href="https://pypi.org/project/yfinance/" target="_blank">yfinance</a> (Yahoo Finance, 15-min delayed) ·
-  Auto-updated daily via GitHub Actions ·
+  Auto-updated every 15 min via GitHub Actions ·
   Historical data: RBC Wealth Management, Morgan Stanley, Euronews, Bloomberg, CNBC/Bernstein (Mar 2026) ·
   <strong>Not financial advice.</strong>
 </div>
@@ -324,7 +324,7 @@ const kpiDefs = [
   { label:"WTI Crude",     val:`$${oil.WTI?.current ?? '—'}/bbl`, sub:`+${(((oil.WTI?.current - oil.WTI?.start)/oil.WTI?.start)*100).toFixed(1)}%`, col:"#ff7700" },
   { label:"VIX Fear Index",val:vix ? vix.current.toFixed(1) : "—", sub: !vix ? "—" : vix.current > 30 ? "High fear" : vix.current > 20 ? "Moderate" : "Low volatility", col:vixCol },
   { label:"10Y Yield",     val:tny ? `${tny.current}%` : "—", sub:"US Treasury · risk-off signal", col:"#00d4ff" },
-  { label:"Data updated",  val:"Daily", sub:updated.split(" ")[0] ?? "—", col:"#888" },
+  { label:"Data updated",  val:"Every 15 min", sub:updated ?? "—", col:"#888" },
 ];
 document.getElementById("kpiGrid").innerHTML = kpiDefs.map(k =>
   `<div class="kpi">
@@ -534,6 +534,9 @@ function renderIndicators(containerId, field) {
 
 renderIndicators("rsiList", "rsi");
 renderIndicators("mfiList", "mfi");
+
+// ── Auto-reload every 15 min to pick up fresh data ───────────────────────────
+setTimeout(() => location.reload(), 15 * 60 * 1000);
 
 // ── Swing Trading Signals ─────────────────────────────────────────────────────
 function swingStyle(sig) {

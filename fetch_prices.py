@@ -218,7 +218,7 @@ def fetch_data():
     for symbol, meta in TICKERS.items():
         try:
             ticker    = yf.Ticker(symbol)
-            hist_full = ticker.history(start=rsi_start, interval="1d")
+            hist_full = ticker.history(start=rsi_start, interval="15m")
             if hist_full.empty:
                 print(f"  ⚠ No data for {symbol}")
                 continue
@@ -232,8 +232,8 @@ def fetch_data():
             baseline   = float(closes_w.iloc[0])
             current    = float(closes_w.iloc[-1])
             pct_change = round((current - baseline) / baseline * 100, 2)
-            series     = [round(float(v), 2) for v in closes_w.tolist()[-20:]]
-            dates      = [d.strftime("%b %d") for d in closes_w.index.tolist()[-20:]]
+            series     = [round(float(v), 2) for v in closes_w.tolist()[-40:]]
+            dates      = [d.strftime("%b %d %H:%M") for d in closes_w.index.tolist()[-40:]]
 
             # RSI from full history (pre-war lookback for accurate priming)
             closes_full = hist_full["Close"].dropna().tolist()
@@ -279,13 +279,13 @@ def fetch_oil():
     oil = {}
     for sym, label in [("BZ=F", "Brent"), ("CL=F", "WTI")]:
         try:
-            hist = yf.Ticker(sym).history(start=WAR_START, interval="1d")
+            hist = yf.Ticker(sym).history(start=WAR_START, interval="15m")
             if hist.empty:
                 continue
             closes = hist["Close"].dropna()
             oil[label] = {
-                "dates":   [d.strftime("%b %d") for d in closes.index.tolist()],
-                "prices":  [round(float(v), 2) for v in closes.tolist()],
+                "dates":   [d.strftime("%b %d %H:%M") for d in closes.index.tolist()[-40:]],
+                "prices":  [round(float(v), 2) for v in closes.tolist()[-40:]],
                 "current": round(float(closes.iloc[-1]), 2),
                 "start":   round(float(closes.iloc[0]), 2),
             }
@@ -301,7 +301,7 @@ def fetch_macro():
     macro = {}
     for sym, label, unit in [("^VIX", "VIX", ""), ("^TNX", "10Y Yield", "%")]:
         try:
-            hist = yf.Ticker(sym).history(period="5d", interval="1d")
+            hist = yf.Ticker(sym).history(period="1d", interval="15m")
             if hist.empty:
                 continue
             closes = hist["Close"].dropna()
