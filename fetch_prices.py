@@ -320,7 +320,7 @@ def fetch_news():
     feeds = [
         ("BBC Middle East",  "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"),
         ("Google News",      "https://news.google.com/rss/search?q=Iran+war+oil+defense+market&hl=en-US&gl=US&ceid=US:en"),
-        ("Reuters World",    "https://feeds.reuters.com/reuters/worldNews"),
+        ("Al Jazeera",       "https://www.aljazeera.com/xml/rss/all.xml"),
     ]
 
     KEYWORDS = [
@@ -395,6 +395,16 @@ def rewrite_html(stock_data, oil_data, macro_data, news_data):
     except FileNotFoundError:
         print(f"✗ {html_path} not found — run from repo root")
         sys.exit(1)
+
+    # If news fetch returned nothing, preserve whatever is already in the HTML
+    if not news_data:
+        existing = re.search(r'"news"\s*:\s*(\[.*?\])', html, flags=re.DOTALL)
+        if existing:
+            try:
+                news_data = json.loads(existing.group(1))
+                print("  ℹ No fresh news — keeping existing headlines")
+            except Exception:
+                pass
 
     payload = {
         "updated":   datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),

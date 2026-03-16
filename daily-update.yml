@@ -2,8 +2,8 @@ name: Price Update (Every 15 min)
 
 on:
   schedule:
-    # Runs every 15 min during market hours (13:00–21:00 UTC = ~9am–5pm ET), Mon–Fri
-    - cron: "*/15 13-21 * * 1-5"
+    # Runs every 15 min, 24/7 — ensures news and prices always stay fresh
+    - cron: "*/15 * * * *"
   workflow_dispatch:   # allows manual trigger from GitHub UI
 
 permissions:
