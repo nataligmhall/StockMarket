@@ -35,4 +35,6 @@ jobs:
           git add index.html
           # Only commit if there are actual changes
           git diff --cached --quiet || git commit -m "chore: price update $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          # Rebase onto latest remote before pushing to avoid conflicts from concurrent runs
+          git pull --rebase origin main
+          git push origin main
