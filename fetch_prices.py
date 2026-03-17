@@ -313,77 +313,113 @@ def fetch_macro():
     return macro
 
 
+def _read_existing_news(html_path="index.html"):
+    """Extract the news array already embedded in index.html as a last-resort fallback."""
+    try:
+        with open(html_path, "r", encoding="utf-8") as f:
+            html = f.read()
+        m = re.search(
+            r"<!-- DATA_JSON_START -->.*?<script[^>]*>(.*?)</script>",
+            html, re.DOTALL
+        )
+        if m:
+            data = json.loads(m.group(1))
+            existing = data.get("news", [])
+            # Reject obvious seed/placeholder entries
+            if existing and not existing[0].get("title", "").startswith("US-Israel"):
+                return existing
+    except Exception:
+        pass
+    return []
+
+
 def fetch_news():
-    """Pull relevant headlines from free RSS feeds (no API key required)."""
-    print("\nFetching news RSS feeds...")
+    """Pull relevant headlines.
 
-    feeds = [
-        ("BBC Middle East",  "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"),
-        ("Google News",      "https://news.google.com/rss/search?q=Iran+war+oil+defense+market&hl=en-US&gl=US&ceid=US:en"),
-        ("Reuters World",    "https://feeds.reuters.com/reuters/worldNews"),
-    ]
-
+    Priority order:
+      1. yfinance built-in news (same network path as price data – most reliable)
+      2. Free RSS feeds (BBC, AP, MarketWatch)
+      3. Preserve whatever is already in index.html (stale is better than empty)
+    """
     KEYWORDS = [
         "iran", "hormuz", "oil", "crude", "defense", "military", "strike",
         "war", "sanction", "lockheed", "raytheon", "northrop", "brent",
         "wti", "conflict", "missile", "irgc", "strait", "opec",
+        "energy", "gas", "lng", "geopolit",
     ]
 
-    items  = []
-    hdrs   = {"User-Agent": "Mozilla/5.0 (compatible; MarketDashBot/1.0)"}
+    items = []
+    seen  = set()
 
-    for source, url in feeds:
+    def _add(title, source, url, ts):
+        key = title[:40].lower()
+        if key in seen or not title:
+            return
+        if not any(kw in title.lower() for kw in KEYWORDS):
+            return
+        seen.add(key)
+        dt_str = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%a, %d %b %Y %H:%M") if ts else ""
+        items.append({"title": title, "source": source, "url": url, "time": dt_str, "ts": ts})
+
+    # ── Tier 1: yfinance news (shares the same HTTP session as price fetches) ──
+    print("\nFetching news via yfinance...")
+    for sym in ["LMT", "XOM", "CVX", "BZ=F", "GLD", "^GSPC", "RTX", "UAL"]:
         try:
-            req  = Request(url, headers=hdrs)
-            data = urlopen(req, timeout=10).read()
-            root = ET.fromstring(data)
-
-            for item in root.iter("item"):
-                title_el  = item.find("title")
-                link_el   = item.find("link")
-                pubdate_el = item.find("pubDate")
-                if title_el is None or not title_el.text:
-                    continue
-
-                title = title_el.text.strip()
-                link  = (link_el.text or "").strip() if link_el is not None else ""
-                pub   = pubdate_el.text.strip() if pubdate_el is not None and pubdate_el.text else ""
-
-                if not any(kw in title.lower() for kw in KEYWORDS):
-                    continue
-
-                try:
-                    dt = datetime.strptime(pub[:25], "%a, %d %b %Y %H:%M:%S")
-                except Exception:
-                    dt = datetime.utcnow()
-
-                items.append({
-                    "title":  title,
-                    "source": source,
-                    "url":    link,
-                    "time":   pub[:16] if pub else "",
-                    "ts":     dt.timestamp(),
-                })
-
-            print(f"  ✓ {source}")
+            for art in (yf.Ticker(sym).news or []):
+                _add(
+                    art.get("title", "").strip(),
+                    art.get("publisher", sym),
+                    art.get("link", ""),
+                    art.get("providerPublishTime", 0),
+                )
         except Exception as e:
-            print(f"  ✗ {source}: {e}")
+            print(f"  ✗ yfinance news {sym}: {e}")
+    print(f"  → {len(items)} from yfinance")
 
-    # Sort by recency, deduplicate on first 40 chars
+    # ── Tier 2: RSS feeds (broader geopolitical / market coverage) ──
+    if len(items) < 8:
+        feeds = [
+            ("AP News",      "https://feeds.apnews.com/rss/apf-topnews"),
+            ("BBC World",    "https://feeds.bbci.co.uk/news/world/rss.xml"),
+            ("MarketWatch",  "https://feeds.content.dowjones.io/public/rss/mw_marketpulse"),
+        ]
+        hdrs = {"User-Agent": "Mozilla/5.0 (compatible; MarketDashBot/1.0)"}
+        print("  Trying RSS feeds...")
+        for source, url in feeds:
+            try:
+                req  = Request(url, headers=hdrs)
+                data = urlopen(req, timeout=10).read()
+                root = ET.fromstring(data)
+                for item in root.iter("item"):
+                    title_el   = item.find("title")
+                    link_el    = item.find("link")
+                    pubdate_el = item.find("pubDate")
+                    if title_el is None or not title_el.text:
+                        continue
+                    pub = pubdate_el.text.strip() if pubdate_el is not None and pubdate_el.text else ""
+                    try:
+                        dt = datetime.strptime(pub[:25], "%a, %d %b %Y %H:%M:%S")
+                        ts = dt.timestamp()
+                    except Exception:
+                        ts = 0
+                    link = (link_el.text or "").strip() if link_el is not None else ""
+                    _add(title_el.text.strip(), source, link, ts)
+                print(f"    ✓ {source}")
+            except Exception as e:
+                print(f"    ✗ {source}: {e}")
+
+    # ── Tier 3: keep whatever was already in the page ──
+    if not items:
+        print("  ⚠ All news sources failed — preserving existing headlines")
+        return _read_existing_news()
+
     items.sort(key=lambda x: x["ts"], reverse=True)
-    seen, unique = set(), []
-    for it in items:
-        key = it["title"][:40].lower()
-        if key not in seen:
-            seen.add(key)
-            unique.append(it)
-        if len(unique) >= 8:
-            break
+    unique = []
+    for it in items[:8]:
+        del it["ts"]
+        unique.append(it)
 
-    for it in unique:
-        del it["ts"]  # don't serialise epoch float into JSON
-
-    print(f"  → {len(unique)} relevant headlines collected")
+    print(f"  → {len(unique)} relevant headlines total")
     return unique
 
 
