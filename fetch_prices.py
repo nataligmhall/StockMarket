@@ -442,8 +442,8 @@ def rewrite_html(stock_data, oil_data, macro_data, news_data):
     }
 
     json_str = json.dumps(payload, indent=2)
-    pattern  = r"(<!-- DATA_JSON_START -->).*?(<!-- DATA_JSON_END -->)"
-    replacement = (
+    pattern  = r"<!-- DATA_JSON_START -->.*?<!-- DATA_JSON_END -->"
+    block = (
         f"<!-- DATA_JSON_START -->\n"
         f"<script id=\"dashData\" type=\"application/json\">\n"
         f"{json_str}\n"
@@ -451,7 +451,10 @@ def rewrite_html(stock_data, oil_data, macro_data, news_data):
         f"<!-- DATA_JSON_END -->"
     )
 
-    new_html, n = re.subn(pattern, replacement, html, flags=re.DOTALL)
+    # Use a lambda so the replacement is treated as a literal string, not a
+    # regex replacement pattern.  Without this, json.dumps output containing
+    # \uXXXX Unicode escapes raises re.error on Python 3.12+.
+    new_html, n = re.subn(pattern, lambda _: block, html, flags=re.DOTALL)
     if n == 0:
         print("✗ Sentinel comments not found in index.html")
         sys.exit(1)
