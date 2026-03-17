@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write      # needed to commit back to the repo
 
+# Opt into Node.js 24 now to avoid breakage after June 2 2026 forced cutover
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   update-prices:
     runs-on: ubuntu-latest
@@ -23,7 +27,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install yfinance
+        run: |
+          pip install --upgrade pip
+          pip install "yfinance>=0.2.54,<0.3"
 
       - name: Fetch prices and update index.html
         run: python fetch_prices.py
