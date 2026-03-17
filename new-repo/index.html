@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Stock Market Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ── Reset & base ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e17;--surface:#111827;--surface2:#1a2234;--border:#1f2d45;
+  --text:#e2e8f0;--muted:#64748b;--green:#00ff9d;--red:#ff4d6d;
+  --cyan:#00d4ff;--gold:#f59e0b;--purple:#a78bfa;
+  --chart-h:340px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6}
+
+/* ── Layout ───────────────────────────────────────────────────── */
+.container{max-width:1400px;margin:0 auto;padding:0 16px}
+section{margin-bottom:40px}
+
+/* ── Header ───────────────────────────────────────────────────── */
+header{border-bottom:1px solid var(--border);padding:20px 0 16px;margin-bottom:32px}
+header .inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--cyan);letter-spacing:.5px}
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.updated-badge{background:#0d2a1f;color:var(--green);border:1px solid var(--green);border-radius:4px;padding:3px 10px;font-size:11px}
+.baseline-note{font-size:10px;color:var(--muted)}
+.disclaimer{font-size:10px;color:var(--muted);margin-top:4px;text-align:center}
+
+/* ── Section titles ───────────────────────────────────────────── */
+.section-title{font-size:.75rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Macro bar ────────────────────────────────────────────────── */
+.macro-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.macro-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 16px;min-width:120px;flex:1}
+.macro-card .mc-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.macro-card .mc-value{font-size:1.3rem;font-weight:700;margin-top:2px}
+.macro-card .mc-change{font-size:11px;margin-top:2px}
+
+/* ── Sector summary grid ──────────────────────────────────────── */
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:36px}
+.sector-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .2s}
+.sector-card:hover{border-color:var(--cyan)}
+.sector-card.active{border-color:var(--cyan);background:var(--surface2)}
+.sc-name{font-weight:700;font-size:.82rem;color:var(--cyan);margin-bottom:4px}
+.sc-avg{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.sc-desc{font-size:10px;color:var(--muted);line-height:1.5}
+.sc-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.sc-tickers span{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--muted)}
+
+/* ── Performance chart ────────────────────────────────────────── */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+.chart-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chart-controls label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-right:4px}
+.filter-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-btn.active{border-color:var(--cyan);color:var(--cyan);background:#0d2233}
+canvas#mainChart{height:var(--chart-h)!important}
+
+/* ── Sector detail blocks ─────────────────────────────────────── */
+.sector-detail{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;overflow:hidden}
+.sector-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;background:var(--surface2)}
+.sector-header:hover{background:#1e2d47}
+.sh-left{display:flex;align-items:center;gap:12px}
+.sh-name{font-weight:700;font-size:.85rem;color:var(--cyan)}
+.sh-desc{font-size:10px;color:var(--muted);max-width:500px;display:none}
+.sh-avg{font-weight:700;font-size:.95rem}
+.sh-toggle{color:var(--muted);font-size:1rem;transition:transform .2s}
+.sector-detail.open .sh-toggle{transform:rotate(180deg)}
+.sector-detail.open .sh-desc{display:block}
+.sector-body{display:none;padding:12px 16px}
+.sector-detail.open .sector-body{display:block}
+
+/* ── Stock table ──────────────────────────────────────────────── */
+.stock-table{width:100%;border-collapse:collapse;font-size:12px}
+.stock-table th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.8px}
+.stock-table td{padding:6px 8px;border-bottom:1px solid #0e1928;vertical-align:middle}
+.stock-table tr:last-child td{border-bottom:none}
+.stock-table tr:hover td{background:#12202f}
+.ticker-badge{background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 6px;font-size:11px;font-weight:700;color:var(--cyan)}
+.pct{font-weight:700}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.neutral{color:var(--muted)}
+
+/* ── Indicator bars ───────────────────────────────────────────── */
+.ind-bar-wrap{position:relative;background:#0a1220;border-radius:3px;height:14px;width:120px;overflow:visible}
+.ind-bar{height:100%;border-radius:3px;transition:width .4s}
+.ind-label{position:absolute;right:-28px;top:0;font-size:10px;line-height:14px;color:var(--muted)}
+.zone-mark{position:absolute;top:0;height:100%;width:1px;background:rgba(255,255,255,.15)}
+
+/* ── Swing signal badges ──────────────────────────────────────── */
+.sig-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.sig-STRONG-BUY {background:#003d1f;color:var(--green);border:1px solid var(--green)}
+.sig-BUY        {background:#012c17;color:#6ee7b7;border:1px solid #6ee7b7}
+.sig-HOLD       {background:#1a1a2e;color:var(--muted);border:1px solid var(--border)}
+.sig-SELL       {background:#2c0f14;color:#fca5a5;border:1px solid #fca5a5}
+.sig-STRONG-SELL{background:#3d0010;color:var(--red);border:1px solid var(--red)}
+
+/* ── Swing signal table ───────────────────────────────────────── */
+.swing-table{width:100%;border-collapse:collapse;font-size:11px}
+.swing-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}
+.swing-table td{padding:5px 8px;border-bottom:1px solid #0e1928;vertical-align:top}
+.swing-table tr:hover td{background:#12202f}
+.score-chip{display:inline-block;width:28px;text-align:center;border-radius:4px;font-weight:700;padding:1px 2px}
+.reasons{color:var(--muted);font-size:10px;margin-top:2px}
+.reasons span{display:block}
+
+/* ── News feed ────────────────────────────────────────────────── */
+.news-list{display:flex;flex-direction:column;gap:8px}
+.news-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:3px}
+.news-meta{display:flex;gap:8px;align-items:center}
+.news-src{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);background:#0d2233;border:1px solid #1a3a55;border-radius:3px;padding:0 5px}
+.news-time{font-size:9px;color:var(--muted)}
+.news-title{font-size:12px;color:var(--text)}
+.news-title a{color:inherit;text-decoration:none}
+.news-title a:hover{color:var(--cyan);text-decoration:underline}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media(max-width:640px){
+  header h1{font-size:1.3rem}
+  .sector-grid{grid-template-columns:1fr}
+  .stock-table{font-size:11px}
+  .stock-table th:nth-child(n+5),.stock-table td:nth-child(n+5){display:none}
+  .ind-bar-wrap{width:80px}
+  canvas#mainChart{height:260px!important;--chart-h:260px}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ── Header ──────────────────────────────────────────────────── -->
+<header>
+  <div class="inner">
+    <div>
+      <h1>Stock Market Dashboard</h1>
+      <p class="disclaimer">For informational purposes only. Not financial advice. Data ~15 min delayed (Yahoo Finance).</p>
+    </div>
+    <div class="meta">
+      <span class="updated-badge">● Updated: <span id="updated">—</span></span>
+      <span class="baseline-note">% change since <span id="baselineDate">—</span></span>
+    </div>
+  </div>
+</header>
+
+<!-- ── Macro bar ────────────────────────────────────────────────── -->
+<section id="macroSection">
+  <div class="section-title">Market Overview</div>
+  <div class="macro-bar" id="macroBar"><!-- filled by JS --></div>
+</section>
+
+<!-- ── Sector summary ───────────────────────────────────────────── -->
+<section id="sectorSummarySection">
+  <div class="section-title">Sectors — Click to Filter Chart</div>
+  <div class="sector-grid" id="sectorGrid"><!-- filled by JS --></div>
+</section>
+
+<!-- ── Performance Chart ────────────────────────────────────────── -->
+<section id="chartSection">
+  <div class="section-title">% Change Since Baseline</div>
+  <div class="chart-wrap">
+    <div class="chart-controls">
+      <label>Show:</label>
+      <button class="filter-btn active" data-sector="ALL" onclick="filterChart(this)">All</button>
+      <!-- sector buttons added by JS -->
+    </div>
+    <canvas id="mainChart"></canvas>
+  </div>
+</section>
+
+<!-- ── Sector Detail Blocks ─────────────────────────────────────── -->
+<section id="sectorDetailSection">
+  <div class="section-title">Stocks by Sector</div>
+  <div id="sectorDetails"><!-- filled by JS --></div>
+</section>
+
+<!-- ── Technical Signals ────────────────────────────────────────── -->
+<section id="techSection">
+  <div class="section-title">Technical Indicators — RSI &amp; MFI</div>
+  <div class="chart-wrap" style="overflow-x:auto">
+    <table class="stock-table" id="techTable">
+      <thead><tr>
+        <th>Ticker</th><th>Name</th><th>Sector</th>
+        <th>RSI(14)</th><th>MFI(14)</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── Swing Trading Signals ────────────────────────────────────── -->
+<section id="swingSection">
+  <div class="section-title">Swing Trading Signals</div>
+  <div class="chart-wrap" style="overflow-x:auto">
+    <table class="swing-table" id="swingTable">
+      <thead><tr>
+        <th>Ticker</th><th>Sector</th><th>Signal</th><th>Score</th><th>Rules</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── News Feed ─────────────────────────────────────────────────── -->
+<section id="newsSection">
+  <div class="section-title">Finance News</div>
+  <div class="news-list" id="newsList"><!-- filled by JS --></div>
+</section>
+
+<!-- DATA_JSON_START -->
+<script id="dashData" type="application/json">
+{"updated":"—","baseline_date":"—","sectors":{},"stocks":{},"benchmarks":{},"macro":{},"news":[]}
+</script>
+<!-- DATA_JSON_END -->
+
+<footer style="border-top:1px solid var(--border);padding:20px 0;margin-top:40px;color:var(--muted);font-size:10px;text-align:center">
+  Data via <a href="https://finance.yahoo.com" style="color:var(--cyan);text-decoration:none">Yahoo Finance</a> (yfinance) ·
+  Updates every 15 min on weekdays ·
+  No API keys required ·
+  Not financial advice
+</footer>
+
+</div><!-- /container -->
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────
+const DATA = JSON.parse(document.getElementById('dashData').textContent);
+
+const SECTOR_COLORS = {
+  'Large-Cap Tech':           '#00d4ff',
+  'Semiconductors':           '#a78bfa',
+  'Cybersecurity':            '#ff4d6d',
+  'Fintech & Finance':        '#f59e0b',
+  'Healthcare & Pharma':      '#6ee7b7',
+  'Retail & Consumer':        '#fb923c',
+  'Energy':                   '#fde047',
+  'Industrial & Infrastructure': '#94a3b8',
+  'Emerging Tech':            '#f0abfc',
+};
+
+const TICKER_COLORS = {};
+let colorIndex = 0;
+const PALETTE = [
+  '#00d4ff','#00ff9d','#a78bfa','#ff4d6d','#f59e0b','#6ee7b7',
+  '#fb923c','#fde047','#f0abfc','#60a5fa','#34d399','#f472b6',
+  '#c084fc','#38bdf8','#4ade80','#facc15','#fb7185','#818cf8',
+  '#22d3ee','#a3e635','#e879f9','#2dd4bf','#fb923c','#fbbf24',
+  '#e2e8f0','#94a3b8','#475569','#cbd5e1','#64748b','#0ea5e9',
+  '#10b981','#8b5cf6',
+];
+Object.keys(DATA.stocks || {}).forEach(t => {
+  TICKER_COLORS[t] = PALETTE[colorIndex++ % PALETTE.length];
+});
+
+// ── Utilities ─────────────────────────────────────────────────────────────
+function pctClass(v){ return v > 0 ? 'pos' : v < 0 ? 'neg' : 'neutral'; }
+function pctStr(v) { return v == null ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
+function esc(s)    { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function indColor(v, isRSI) {
+  if (v == null) return '#475569';
+  if (isRSI) return v <= 30 ? '#00ff9d' : v >= 70 ? '#ff4d6d' : '#00d4ff';
+  return v <= 30 ? '#00ff9d' : v >= 80 ? '#ff4d6d' : '#00d4ff';
+}
+
+function sigClass(sig) {
+  return 'sig-' + (sig || 'HOLD').replace(/\s+/g, '-');
+}
+
+function scoreStyle(s) {
+  if (s >= 3)  return 'background:#003d1f;color:#00ff9d';
+  if (s >= 1)  return 'background:#012c17;color:#6ee7b7';
+  if (s <= -3) return 'background:#3d0010;color:#ff4d6d';
+  if (s <= -1) return 'background:#2c0f14;color:#fca5a5';
+  return 'background:#1a1a2e;color:#64748b';
+}
+
+// ── Header ────────────────────────────────────────────────────────────────
+document.getElementById('updated').textContent      = DATA.updated || '—';
+document.getElementById('baselineDate').textContent = DATA.baseline_date || '—';
+
+// ── Macro Bar ─────────────────────────────────────────────────────────────
+function renderMacro() {
+  const bar = document.getElementById('macroBar');
+
+  // Benchmarks first
+  Object.values(DATA.benchmarks || {}).forEach(b => {
+    const cls = pctClass(b.pct_change);
+    bar.innerHTML += `
+      <div class="macro-card">
+        <div class="mc-label">${esc(b.name)}</div>
+        <div class="mc-value">${b.current != null ? b.current.toLocaleString() : '—'}</div>
+        <div class="mc-change ${cls}">${pctStr(b.pct_change)} since baseline</div>
+      </div>`;
+  });
+
+  // VIX, 10Y
+  Object.entries(DATA.macro || {}).forEach(([k, v]) => {
+    bar.innerHTML += `
+      <div class="macro-card">
+        <div class="mc-label">${esc(k)}</div>
+        <div class="mc-value">${v.current != null ? v.current + (v.unit || '') : '—'}</div>
+      </div>`;
+  });
+}
+
+// ── Sector Summary Grid ───────────────────────────────────────────────────
+let activeSectorFilter = 'ALL';
+
+function renderSectorGrid() {
+  const grid  = document.getElementById('sectorGrid');
+  const ctrls = document.querySelector('.chart-controls');
+
+  Object.entries(DATA.sectors || {}).forEach(([name, sec]) => {
+    const avg = sec.avg_change;
+    const cls = pctClass(avg);
+    const col = SECTOR_COLORS[name] || '#94a3b8';
+
+    grid.innerHTML += `
+      <div class="sector-card" id="sc-${btoa(name).replace(/=/g,'')}" onclick="filterChart(null,'${esc(name)}')"
+           style="border-top:3px solid ${col}">
+        <div class="sc-name">${esc(name)}</div>
+        <div class="sc-avg ${cls}">${pctStr(avg)}</div>
+        <div class="sc-desc">${esc(sec.description || '')}</div>
+        <div class="sc-tickers">${(sec.tickers || []).map(t => `<span>${esc(t)}</span>`).join('')}</div>
+      </div>`;
+
+    // Add filter button to chart
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.dataset.sector = name;
+    btn.textContent = name;
+    btn.style.borderColor = col;
+    btn.onclick = function(){ filterChart(this); };
+    ctrls.appendChild(btn);
+  });
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────
+let mainChart;
+
+function buildDatasets(sectorFilter) {
+  const stocks = DATA.stocks || {};
+  return Object.values(stocks)
+    .filter(s => sectorFilter === 'ALL' || s.sector === sectorFilter)
+    .map(s => {
+      const baseline = s.baseline || s.series?.[0] || 1;
+      const pctSeries = (s.series || []).map(p => +((p - baseline) / baseline * 100).toFixed(2));
+      return {
+        label:           s.ticker,
+        data:            pctSeries,
+        borderColor:     TICKER_COLORS[s.ticker] || '#94a3b8',
+        backgroundColor: 'transparent',
+        borderWidth:     1.5,
+        pointRadius:     0,
+        tension:         0.3,
+        _sector:         s.sector,
+      };
+    });
+}
+
+function allDates() {
+  const stocks = Object.values(DATA.stocks || {});
+  let longest = [];
+  stocks.forEach(s => { if ((s.dates||[]).length > longest.length) longest = s.dates; });
+  return longest;
+}
+
+function initChart() {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  mainChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: allDates(), datasets: buildDatasets('ALL') },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index', intersect: false,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color:'#64748b', maxTicksLimit:10, font:{family:'JetBrains Mono',size:10} },
+          grid:  { color:'#1a2234' }
+        },
+        y: {
+          ticks: {
+            color:'#64748b', font:{family:'JetBrains Mono',size:10},
+            callback: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%'
+          },
+          grid: { color:'#1a2234' }
+        }
+      }
+    }
+  });
+}
+
+function filterChart(btn, sectorName) {
+  // Resolve sector name from button or direct argument
+  const sector = sectorName || (btn && btn.dataset.sector) || 'ALL';
+  activeSectorFilter = sector;
+
+  // Update button styles
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sector === sector);
+  });
+  // Update sector card styles
+  document.querySelectorAll('.sector-card').forEach(c => {
+    const key = btoa(c.dataset ? c.dataset.sector || '' : '').replace(/=/g,'');
+    c.classList.remove('active');
+  });
+
+  if (mainChart) {
+    mainChart.data.datasets = buildDatasets(sector);
+    mainChart.update();
+  }
+}
+
+// ── Sector Detail Blocks ──────────────────────────────────────────────────
+function renderSectorDetails() {
+  const container = document.getElementById('sectorDetails');
+  const stocksBySector = {};
+
+  Object.values(DATA.stocks || {}).forEach(s => {
+    if (!stocksBySector[s.sector]) stocksBySector[s.sector] = [];
+    stocksBySector[s.sector].push(s);
+  });
+
+  Object.entries(DATA.sectors || {}).forEach(([name, sec], idx) => {
+    const stocks = (stocksBySector[name] || []).sort((a,b) => b.pct_change - a.pct_change);
+    const avg = sec.avg_change;
+    const col  = SECTOR_COLORS[name] || '#94a3b8';
+
+    const rows = stocks.map(s => `
+      <tr>
+        <td><span class="ticker-badge">${esc(s.ticker)}</span></td>
+        <td>${esc(s.name)}</td>
+        <td class="pct ${pctClass(s.pct_change)}">${pctStr(s.pct_change)}</td>
+        <td>$${s.current != null ? s.current.toFixed(2) : '—'}</td>
+        <td>$${s.baseline != null ? s.baseline.toFixed(2) : '—'}</td>
+        <td>${s.rsi != null ? s.rsi.toFixed(1) : '—'}</td>
+        <td>${s.mfi != null ? s.mfi.toFixed(1) : '—'}</td>
+        <td><span class="sig-badge ${sigClass(s.swing?.signal)}">${esc(s.swing?.signal || 'N/A')}</span></td>
+      </tr>`).join('');
+
+    container.innerHTML += `
+      <div class="sector-detail${idx < 2 ? ' open' : ''}" style="border-top:3px solid ${col}">
+        <div class="sector-header" onclick="toggleSector(this)">
+          <div class="sh-left">
+            <span class="sh-name">${esc(name)}</span>
+            <span class="sh-desc">${esc(sec.description || '')}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="sh-avg ${pctClass(avg)}">Avg: ${pctStr(avg)}</span>
+            <span class="sh-toggle">▼</span>
+          </div>
+        </div>
+        <div class="sector-body">
+          <div style="overflow-x:auto">
+            <table class="stock-table">
+              <thead><tr>
+                <th>Ticker</th><th>Name</th><th>Change</th>
+                <th>Current</th><th>Baseline</th>
+                <th>RSI</th><th>MFI</th><th>Signal</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function toggleSector(header) {
+  header.closest('.sector-detail').classList.toggle('open');
+}
+
+// ── Technical Indicators Table ────────────────────────────────────────────
+function renderTechnicals() {
+  const tbody = document.querySelector('#techTable tbody');
+  const stocks = Object.values(DATA.stocks || {});
+
+  tbody.innerHTML = stocks.map(s => {
+    const rsiVal = s.rsi, mfiVal = s.mfi;
+    const rsiW = rsiVal != null ? rsiVal : 0;
+    const mfiW = mfiVal != null ? mfiVal : 0;
+    const rsiC = indColor(rsiVal, true);
+    const mfiC = indColor(mfiVal, false);
+
+    return `
+      <tr>
+        <td><span class="ticker-badge">${esc(s.ticker)}</span></td>
+        <td>${esc(s.name)}</td>
+        <td style="color:${SECTOR_COLORS[s.sector]||'#94a3b8'};font-size:10px">${esc(s.sector)}</td>
+        <td>
+          <div class="ind-bar-wrap">
+            <div class="ind-bar" style="width:${rsiW}%;background:${rsiC}"></div>
+            <div class="zone-mark" style="left:30%"></div>
+            <div class="zone-mark" style="left:70%"></div>
+            <span class="ind-label">${rsiVal != null ? rsiVal.toFixed(0) : '—'}</span>
+          </div>
+        </td>
+        <td>
+          <div class="ind-bar-wrap">
+            <div class="ind-bar" style="width:${mfiW}%;background:${mfiC}"></div>
+            <div class="zone-mark" style="left:30%"></div>
+            <div class="zone-mark" style="left:80%"></div>
+            <span class="ind-label">${mfiVal != null ? mfiVal.toFixed(0) : '—'}</span>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+// ── Swing Trading Signals ─────────────────────────────────────────────────
+function renderSwingSignals() {
+  const tbody = document.querySelector('#swingTable tbody');
+  const stocks = Object.values(DATA.stocks || {});
+
+  tbody.innerHTML = stocks.map(s => {
+    const sw = s.swing || {};
+    const reasons = (sw.reasons || []).map(r => `<span>• ${esc(r)}</span>`).join('');
+    const scoreS  = scoreStyle(sw.score || 0);
+    return `
+      <tr>
+        <td><span class="ticker-badge">${esc(s.ticker)}</span></td>
+        <td style="color:${SECTOR_COLORS[s.sector]||'#94a3b8'};font-size:10px">${esc(s.sector)}</td>
+        <td><span class="sig-badge ${sigClass(sw.signal)}">${esc(sw.signal || 'N/A')}</span></td>
+        <td><span class="score-chip" style="${scoreS}">${(sw.score||0) >= 0 ? '+' : ''}${sw.score||0}</span></td>
+        <td><div class="reasons">${reasons}</div></td>
+      </tr>`;
+  }).join('');
+}
+
+// ── News ──────────────────────────────────────────────────────────────────
+function renderNews() {
+  const list  = document.getElementById('newsList');
+  const news  = DATA.news || [];
+
+  if (!news.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:11px">No news available — will populate on next data fetch.</p>';
+    return;
+  }
+
+  list.innerHTML = news.map(item => `
+    <div class="news-item">
+      <div class="news-meta">
+        <span class="news-src">${esc(item.source || 'News')}</span>
+        <span class="news-time">${esc(item.time || '')}</span>
+      </div>
+      <div class="news-title">
+        <a href="${esc(item.url || '#')}" target="_blank" rel="noopener">${esc(item.title || '')}</a>
+      </div>
+    </div>`).join('');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderMacro();
+renderSectorGrid();
+initChart();
+renderSectorDetails();
+renderTechnicals();
+renderSwingSignals();
+renderNews();
+</script>
+</body>
+</html>
