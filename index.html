@@ -113,7 +113,7 @@
 <!-- DATA_JSON_START -->
 <script id="dashData" type="application/json">
 {
-  "updated": "2026-03-19 12:56 UTC",
+  "updated": "2026-03-19 14:07 UTC",
   "war_start": "2026-02-27",
   "stocks": {
     "LMT": {
@@ -121,13 +121,10 @@
       "sector": "Defense",
       "side": "winner",
       "ticker": "LMT",
-      "current": 642.2,
+      "current": 625.9,
       "baseline": 653.94,
-      "pct_change": -1.8,
+      "pct_change": -4.29,
       "series": [
-        634.39,
-        635.46,
-        637.39,
         636.6,
         635.4,
         634.88,
@@ -164,12 +161,12 @@
         642.7,
         642.26,
         641.29,
-        642.2
+        642.2,
+        631.14,
+        625.95,
+        625.9
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -206,24 +203,29 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 52.4,
-      "mfi": 63.4,
+      "rsi": 19.5,
+      "mfi": 37.1,
       "swing": {
-        "signal": "SELL",
-        "score": -2,
+        "signal": "HOLD",
+        "score": 0,
         "reasons": [
-          "MACD hist -0.289 \u2192 bearish momentum",
-          "Price $642.20 below SMA20 $642.45"
+          "RSI 19.5 \u2192 oversold, bounce candidate",
+          "MACD hist -2.096 \u2192 bearish momentum",
+          "Price $625.90 below SMA20 $640.51",
+          "Near lower Bollinger Band (%B -0.16)"
         ],
-        "macd": 0.7018,
-        "macd_sig": 0.9906,
-        "macd_hist": -0.2889,
-        "sma20": 642.45,
-        "bb_upper": 645.01,
-        "bb_lower": 639.88,
-        "bb_pct_b": 0.452
+        "macd": -2.309,
+        "macd_sig": -0.213,
+        "macd_hist": -2.096,
+        "sma20": 640.51,
+        "bb_upper": 651.65,
+        "bb_lower": 629.38,
+        "bb_pct_b": -0.156
       }
     },
     "RTX": {
@@ -231,13 +233,10 @@
       "sector": "Defense",
       "side": "winner",
       "ticker": "RTX",
-      "current": 204.55,
+      "current": 198.05,
       "baseline": 198.93,
-      "pct_change": 2.83,
+      "pct_change": -0.44,
       "series": [
-        203.08,
-        203.38,
-        203.52,
         203.34,
         202.65,
         202.65,
@@ -274,12 +273,12 @@
         205.4,
         205.05,
         204.81,
-        204.55
+        204.55,
+        199.5,
+        197.77,
+        198.05
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -316,26 +315,30 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 42.5,
-      "mfi": 21.5,
+      "rsi": 20.6,
+      "mfi": 15.4,
       "swing": {
-        "signal": "HOLD",
-        "score": 0,
+        "signal": "BUY",
+        "score": 1,
         "reasons": [
-          "MFI 21.5 \u2192 oversold volume, buying pressure",
-          "MACD hist -0.260 \u2192 bearish momentum",
-          "Price $204.55 below SMA20 $205.76",
-          "Near lower Bollinger Band (%B 0.02)"
+          "RSI 20.6 \u2192 oversold, bounce candidate",
+          "MFI 15.4 \u2192 oversold volume, buying pressure",
+          "MACD hist -1.004 \u2192 bearish momentum",
+          "Price $198.05 below SMA20 $204.7",
+          "Near lower Bollinger Band (%B -0.11)"
         ],
-        "macd": 0.1029,
-        "macd_sig": 0.3628,
-        "macd_hist": -0.2599,
-        "sma20": 205.76,
-        "bb_upper": 207.03,
-        "bb_lower": 204.49,
-        "bb_pct_b": 0.024
+        "macd": -1.2621,
+        "macd_sig": -0.2583,
+        "macd_hist": -1.0038,
+        "sma20": 204.7,
+        "bb_upper": 210.13,
+        "bb_lower": 199.26,
+        "bb_pct_b": -0.111
       }
     },
     "NOC": {
@@ -343,13 +346,10 @@
       "sector": "Defense",
       "side": "winner",
       "ticker": "NOC",
-      "current": 724.84,
+      "current": 713.89,
       "baseline": 723.9,
-      "pct_change": 0.13,
+      "pct_change": -1.38,
       "series": [
-        721.48,
-        724.36,
-        724.98,
         723.67,
         722.44,
         722.54,
@@ -386,12 +386,12 @@
         726.54,
         726.15,
         725.4,
-        724.84
+        724.84,
+        714.7,
+        714.21,
+        713.89
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -428,25 +428,30 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 43.6,
-      "mfi": 37.5,
+      "rsi": 23.8,
+      "mfi": 22.0,
       "swing": {
-        "signal": "SELL",
-        "score": -1,
+        "signal": "BUY",
+        "score": 1,
         "reasons": [
-          "MACD hist -0.342 \u2192 bearish momentum",
-          "Price $724.84 below SMA20 $726.98",
-          "Near lower Bollinger Band (%B 0.13)"
+          "RSI 23.8 \u2192 oversold, bounce candidate",
+          "MFI 22.0 \u2192 oversold volume, buying pressure",
+          "MACD hist -1.639 \u2192 bearish momentum",
+          "Price $713.89 below SMA20 $725.11",
+          "Near lower Bollinger Band (%B -0.10)"
         ],
-        "macd": 0.0161,
-        "macd_sig": 0.3577,
-        "macd_hist": -0.3417,
-        "sma20": 726.98,
-        "bb_upper": 729.89,
-        "bb_lower": 724.06,
-        "bb_pct_b": 0.134
+        "macd": -2.3084,
+        "macd_sig": -0.6693,
+        "macd_hist": -1.639,
+        "sma20": 725.11,
+        "bb_upper": 734.54,
+        "bb_lower": 715.68,
+        "bb_pct_b": -0.095
       }
     },
     "XOM": {
@@ -454,13 +459,10 @@
       "sector": "Energy",
       "side": "winner",
       "ticker": "XOM",
-      "current": 157.58,
+      "current": 156.3,
       "baseline": 150.94,
-      "pct_change": 4.4,
+      "pct_change": 3.55,
       "series": [
-        160.12,
-        160.01,
-        159.84,
         159.48,
         159.46,
         159.49,
@@ -497,12 +499,12 @@
         158.76,
         158.55,
         158.15,
-        157.58
+        157.58,
+        155.74,
+        155.35,
+        156.3
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -539,26 +541,29 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 30.0,
-      "mfi": 30.2,
+      "rsi": 31.4,
+      "mfi": 16.6,
       "swing": {
         "signal": "HOLD",
         "score": 0,
         "reasons": [
-          "RSI 30.0 \u2192 oversold, bounce candidate",
-          "MACD hist -0.139 \u2192 bearish momentum",
-          "Price $157.58 below SMA20 $158.83",
-          "Near lower Bollinger Band (%B -0.17)"
+          "MFI 16.6 \u2192 oversold volume, buying pressure",
+          "MACD hist -0.354 \u2192 bearish momentum",
+          "Price $156.30 below SMA20 $158.4",
+          "Near lower Bollinger Band (%B 0.06)"
         ],
-        "macd": -0.2262,
-        "macd_sig": -0.0871,
-        "macd_hist": -0.1391,
-        "sma20": 158.83,
-        "bb_upper": 159.77,
-        "bb_lower": 157.89,
-        "bb_pct_b": -0.165
+        "macd": -0.6939,
+        "macd_sig": -0.3396,
+        "macd_hist": -0.3543,
+        "sma20": 158.4,
+        "bb_upper": 160.8,
+        "bb_lower": 156.01,
+        "bb_pct_b": 0.061
       }
     },
     "CVX": {
@@ -566,13 +571,10 @@
       "sector": "Energy",
       "side": "winner",
       "ticker": "CVX",
-      "current": 198.62,
+      "current": 200.5,
       "baseline": 185.54,
-      "pct_change": 7.05,
+      "pct_change": 8.06,
       "series": [
-        199.77,
-        199.6,
-        199.47,
         198.93,
         198.85,
         198.56,
@@ -609,12 +611,12 @@
         199.68,
         199.62,
         199.39,
-        198.62
+        198.62,
+        199.65,
+        200.06,
+        200.5
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -651,25 +653,28 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 37.9,
-      "mfi": 35.2,
+      "rsi": 60.7,
+      "mfi": 51.7,
       "swing": {
-        "signal": "SELL",
-        "score": -1,
+        "signal": "BUY",
+        "score": 1,
         "reasons": [
-          "MACD hist -0.148 \u2192 bearish momentum",
-          "Price $198.62 below SMA20 $199.72",
-          "Near lower Bollinger Band (%B -0.18)"
+          "MACD hist +0.009 \u2192 bullish momentum",
+          "Price $200.50 above SMA20 $199.79",
+          "Near upper Bollinger Band (%B 0.90)"
         ],
-        "macd": 0.0291,
-        "macd_sig": 0.1773,
-        "macd_hist": -0.1482,
-        "sma20": 199.72,
-        "bb_upper": 200.53,
+        "macd": 0.1475,
+        "macd_sig": 0.1385,
+        "macd_hist": 0.009,
+        "sma20": 199.79,
+        "bb_upper": 200.67,
         "bb_lower": 198.91,
-        "bb_pct_b": -0.182
+        "bb_pct_b": 0.903
       }
     },
     "COP": {
@@ -677,13 +682,10 @@
       "sector": "Energy",
       "side": "winner",
       "ticker": "COP",
-      "current": 123.69,
+      "current": 124.38,
       "baseline": 112.92,
-      "pct_change": 9.54,
+      "pct_change": 10.14,
       "series": [
-        123.48,
-        123.32,
-        123.53,
         123.36,
         123.47,
         123.45,
@@ -720,12 +722,12 @@
         124.4,
         124.47,
         123.87,
-        123.69
+        123.69,
+        124.36,
+        124.1,
+        124.38
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -762,24 +764,27 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 46.4,
-      "mfi": 39.0,
+      "rsi": 56.6,
+      "mfi": 39.9,
       "swing": {
-        "signal": "SELL",
-        "score": -2,
+        "signal": "HOLD",
+        "score": 0,
         "reasons": [
-          "MACD hist -0.063 \u2192 bearish momentum",
-          "Price $123.69 below SMA20 $124.02"
+          "MACD hist -0.040 \u2192 bearish momentum",
+          "Price $124.38 above SMA20 $124.13"
         ],
-        "macd": 0.2131,
-        "macd_sig": 0.2763,
-        "macd_hist": -0.0632,
-        "sma20": 124.02,
-        "bb_upper": 124.74,
-        "bb_lower": 123.3,
-        "bb_pct_b": 0.271
+        "macd": 0.2012,
+        "macd_sig": 0.2411,
+        "macd_hist": -0.0399,
+        "sma20": 124.13,
+        "bb_upper": 124.75,
+        "bb_lower": 123.51,
+        "bb_pct_b": 0.698
       }
     },
     "LNG": {
@@ -787,13 +792,10 @@
       "sector": "LNG",
       "side": "winner",
       "ticker": "LNG",
-      "current": 266.33,
+      "current": 291.92,
       "baseline": 234.94,
-      "pct_change": 13.36,
+      "pct_change": 24.25,
       "series": [
-        253.59,
-        253.73,
-        253.93,
         253.38,
         253.12,
         252.82,
@@ -830,12 +832,12 @@
         261.47,
         262.14,
         264.64,
-        266.33
+        266.33,
+        284.43,
+        287.83,
+        291.92
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -872,27 +874,30 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 89.3,
-      "mfi": 95.8,
+      "rsi": 96.6,
+      "mfi": 97.8,
       "swing": {
         "signal": "SELL",
         "score": -1,
         "reasons": [
-          "RSI 89.3 \u2192 overbought, pullback risk",
-          "MFI 95.8 \u2192 overbought volume, selling pressure",
-          "MACD hist +1.129 \u2192 bullish momentum",
-          "Price $266.33 above SMA20 $256.78",
-          "Near upper Bollinger Band (%B 1.11)"
+          "RSI 96.6 \u2192 overbought, pullback risk",
+          "MFI 97.8 \u2192 overbought volume, selling pressure",
+          "MACD hist +3.682 \u2192 bullish momentum",
+          "Price $291.92 above SMA20 $262.01",
+          "Near upper Bollinger Band (%B 1.15)"
         ],
-        "macd": 2.9038,
-        "macd_sig": 1.7744,
-        "macd_hist": 1.1294,
-        "sma20": 256.78,
-        "bb_upper": 264.64,
-        "bb_lower": 248.91,
-        "bb_pct_b": 1.107
+        "macd": 7.7284,
+        "macd_sig": 4.0461,
+        "macd_hist": 3.6822,
+        "sma20": 262.01,
+        "bb_upper": 285.19,
+        "bb_lower": 238.84,
+        "bb_pct_b": 1.145
       }
     },
     "GLD": {
@@ -900,13 +905,10 @@
       "sector": "Safe Haven",
       "side": "winner",
       "ticker": "GLD",
-      "current": 444.83,
+      "current": 425.63,
       "baseline": 480.18,
-      "pct_change": -7.36,
+      "pct_change": -11.36,
       "series": [
-        459.55,
-        459.5,
-        459.62,
         459.55,
         459.08,
         459.58,
@@ -943,12 +945,12 @@
         446.16,
         445.41,
         445.57,
-        444.83
+        444.83,
+        418.71,
+        424.39,
+        425.63
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -985,27 +987,30 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 25.2,
-      "mfi": 19.9,
+      "rsi": 23.0,
+      "mfi": 24.8,
       "swing": {
         "signal": "BUY",
         "score": 1,
         "reasons": [
-          "RSI 25.2 \u2192 oversold, bounce candidate",
-          "MFI 19.9 \u2192 oversold volume, buying pressure",
-          "MACD hist -0.015 \u2192 bearish momentum",
-          "Price $444.83 below SMA20 $447.68",
-          "Near lower Bollinger Band (%B 0.01)"
+          "RSI 23.0 \u2192 oversold, bounce candidate",
+          "MFI 24.8 \u2192 oversold volume, buying pressure",
+          "MACD hist -2.414 \u2192 bearish momentum",
+          "Price $425.63 below SMA20 $444.01",
+          "Near lower Bollinger Band (%B -0.01)"
         ],
-        "macd": -2.0185,
-        "macd_sig": -2.0039,
-        "macd_hist": -0.0146,
-        "sma20": 447.68,
-        "bb_upper": 450.59,
-        "bb_lower": 444.78,
-        "bb_pct_b": 0.009
+        "macd": -6.015,
+        "macd_sig": -3.6006,
+        "macd_hist": -2.4144,
+        "sma20": 444.01,
+        "bb_upper": 462.12,
+        "bb_lower": 425.9,
+        "bb_pct_b": -0.007
       }
     },
     "UAL": {
@@ -1013,13 +1018,10 @@
       "sector": "Airlines",
       "side": "loser",
       "ticker": "UAL",
-      "current": 92.53,
+      "current": 91.63,
       "baseline": 108.75,
-      "pct_change": -14.91,
+      "pct_change": -15.74,
       "series": [
-        92.16,
-        92.5,
-        94.07,
         93.59,
         93.67,
         93.71,
@@ -1056,12 +1058,12 @@
         93.73,
         93.06,
         92.67,
-        92.53
+        92.53,
+        91.27,
+        91.76,
+        91.63
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -1098,26 +1100,28 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 34.5,
-      "mfi": 26.5,
+      "rsi": 31.9,
+      "mfi": 32.2,
       "swing": {
-        "signal": "HOLD",
-        "score": 0,
+        "signal": "SELL",
+        "score": -1,
         "reasons": [
-          "MFI 26.5 \u2192 oversold volume, buying pressure",
-          "MACD hist -0.278 \u2192 bearish momentum",
-          "Price $92.53 below SMA20 $94.01",
-          "Near lower Bollinger Band (%B -0.13)"
+          "MACD hist -0.371 \u2192 bearish momentum",
+          "Price $91.63 below SMA20 $93.64",
+          "Near lower Bollinger Band (%B 0.02)"
         ],
-        "macd": -0.046,
-        "macd_sig": 0.2319,
-        "macd_hist": -0.2778,
-        "sma20": 94.01,
-        "bb_upper": 95.19,
-        "bb_lower": 92.84,
-        "bb_pct_b": -0.132
+        "macd": -0.4178,
+        "macd_sig": -0.0472,
+        "macd_hist": -0.3706,
+        "sma20": 93.64,
+        "bb_upper": 95.76,
+        "bb_lower": 91.53,
+        "bb_pct_b": 0.024
       }
     },
     "AAL": {
@@ -1125,13 +1129,10 @@
       "sector": "Airlines",
       "side": "loser",
       "ticker": "AAL",
-      "current": 10.8,
+      "current": 10.72,
       "baseline": 13.12,
-      "pct_change": -17.71,
+      "pct_change": -18.36,
       "series": [
-        10.82,
-        10.85,
-        10.94,
         10.86,
         10.89,
         10.9,
@@ -1168,12 +1169,12 @@
         10.89,
         10.86,
         10.81,
-        10.8
+        10.8,
+        10.68,
+        10.74,
+        10.72
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -1210,25 +1211,28 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 38.4,
-      "mfi": 53.7,
+      "rsi": 35.8,
+      "mfi": 50.3,
       "swing": {
         "signal": "SELL",
         "score": -1,
         "reasons": [
-          "MACD hist -0.025 \u2192 bearish momentum",
-          "Price $10.80 below SMA20 $10.94",
-          "Near lower Bollinger Band (%B -0.09)"
+          "MACD hist -0.033 \u2192 bearish momentum",
+          "Price $10.72 below SMA20 $10.89",
+          "Near lower Bollinger Band (%B 0.04)"
         ],
-        "macd": -0.0021,
-        "macd_sig": 0.0226,
-        "macd_hist": -0.0246,
-        "sma20": 10.94,
-        "bb_upper": 11.05,
-        "bb_lower": 10.82,
-        "bb_pct_b": -0.087
+        "macd": -0.0357,
+        "macd_sig": -0.0024,
+        "macd_hist": -0.0332,
+        "sma20": 10.89,
+        "bb_upper": 11.08,
+        "bb_lower": 10.7,
+        "bb_pct_b": 0.039
       }
     },
     "DAL": {
@@ -1236,13 +1240,10 @@
       "sector": "Airlines",
       "side": "loser",
       "ticker": "DAL",
-      "current": 63.81,
+      "current": 63.8,
       "baseline": 66.67,
-      "pct_change": -4.29,
+      "pct_change": -4.3,
       "series": [
-        63.83,
-        64.12,
-        64.85,
         65.16,
         65.14,
         65.08,
@@ -1279,12 +1280,12 @@
         64.4,
         64.0,
         63.81,
-        63.81
+        63.81,
+        63.39,
+        63.92,
+        63.8
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -1321,26 +1322,29 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 34.7,
-      "mfi": 18.9,
+      "rsi": 41.2,
+      "mfi": 23.9,
       "swing": {
         "signal": "HOLD",
         "score": 0,
         "reasons": [
-          "MFI 18.9 \u2192 oversold volume, buying pressure",
-          "MACD hist -0.136 \u2192 bearish momentum",
-          "Price $63.81 below SMA20 $64.49",
-          "Near lower Bollinger Band (%B -0.10)"
+          "MFI 23.9 \u2192 oversold volume, buying pressure",
+          "MACD hist -0.118 \u2192 bearish momentum",
+          "Price $63.80 below SMA20 $64.35",
+          "Near lower Bollinger Band (%B 0.15)"
         ],
-        "macd": -0.0588,
-        "macd_sig": 0.077,
-        "macd_hist": -0.1358,
-        "sma20": 64.49,
-        "bb_upper": 65.05,
-        "bb_lower": 63.92,
-        "bb_pct_b": -0.097
+        "macd": -0.1448,
+        "macd_sig": -0.0264,
+        "macd_hist": -0.1184,
+        "sma20": 64.35,
+        "bb_upper": 65.14,
+        "bb_lower": 63.56,
+        "bb_pct_b": 0.152
       }
     },
     "CCL": {
@@ -1348,13 +1352,10 @@
       "sector": "Travel",
       "side": "loser",
       "ticker": "CCL",
-      "current": 24.16,
+      "current": 24.44,
       "baseline": 31.47,
-      "pct_change": -23.22,
+      "pct_change": -22.31,
       "series": [
-        25.1,
-        25.19,
-        25.38,
         25.28,
         25.32,
         25.27,
@@ -1391,12 +1392,12 @@
         24.55,
         24.36,
         24.34,
-        24.16
+        24.16,
+        24.36,
+        24.51,
+        24.44
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -1433,27 +1434,27 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 20.7,
-      "mfi": 17.0,
+      "rsi": 41.1,
+      "mfi": 40.3,
       "swing": {
-        "signal": "BUY",
-        "score": 1,
+        "signal": "SELL",
+        "score": -2,
         "reasons": [
-          "RSI 20.7 \u2192 oversold, bounce candidate",
-          "MFI 17.0 \u2192 oversold volume, buying pressure",
-          "MACD hist -0.045 \u2192 bearish momentum",
-          "Price $24.16 below SMA20 $24.66",
-          "Near lower Bollinger Band (%B -0.19)"
+          "MACD hist -0.011 \u2192 bearish momentum",
+          "Price $24.44 below SMA20 $24.6"
         ],
-        "macd": -0.1524,
-        "macd_sig": -0.1078,
-        "macd_hist": -0.0447,
-        "sma20": 24.66,
-        "bb_upper": 25.02,
-        "bb_lower": 24.3,
-        "bb_pct_b": -0.194
+        "macd": -0.1356,
+        "macd_sig": -0.1246,
+        "macd_hist": -0.011,
+        "sma20": 24.6,
+        "bb_upper": 24.94,
+        "bb_lower": 24.25,
+        "bb_pct_b": 0.283
       }
     },
     "^GSPC": {
@@ -1461,13 +1462,10 @@
       "sector": "Index",
       "side": "benchmark",
       "ticker": "^GSPC",
-      "current": 6624.38,
+      "current": 6590.36,
       "baseline": 6841.76,
-      "pct_change": -3.18,
+      "pct_change": -3.67,
       "series": [
-        6723.83,
-        6719.07,
-        6725.23,
         6724.63,
         6722.0,
         6726.36,
@@ -1504,12 +1502,12 @@
         6648.45,
         6638.07,
         6628.88,
-        6624.38
+        6624.38,
+        6581.05,
+        6593.62,
+        6590.36
       ],
       "dates": [
-        "Mar 17 12:30",
-        "Mar 17 12:45",
-        "Mar 17 13:00",
         "Mar 17 13:15",
         "Mar 17 13:30",
         "Mar 17 13:45",
@@ -1546,37 +1544,35 @@
         "Mar 18 15:00",
         "Mar 18 15:15",
         "Mar 18 15:30",
-        "Mar 18 15:45"
+        "Mar 18 15:45",
+        "Mar 19 09:30",
+        "Mar 19 09:45",
+        "Mar 19 10:00"
       ],
-      "rsi": 22.8,
-      "mfi": 25.9,
+      "rsi": 22.6,
+      "mfi": 31.9,
       "swing": {
-        "signal": "BUY",
-        "score": 1,
+        "signal": "HOLD",
+        "score": 0,
         "reasons": [
-          "RSI 22.8 \u2192 oversold, bounce candidate",
-          "MFI 25.9 \u2192 oversold volume, buying pressure",
-          "MACD hist -3.602 \u2192 bearish momentum",
-          "Price $6624.38 below SMA20 $6665.04",
-          "Near lower Bollinger Band (%B -0.07)"
+          "RSI 22.6 \u2192 oversold, bounce candidate",
+          "MACD hist -6.838 \u2192 bearish momentum",
+          "Price $6590.36 below SMA20 $6651.08",
+          "Near lower Bollinger Band (%B 0.01)"
         ],
-        "macd": -16.6566,
-        "macd_sig": -13.0551,
-        "macd_hist": -3.6015,
-        "sma20": 6665.04,
-        "bb_upper": 6701.03,
-        "bb_lower": 6629.04,
-        "bb_pct_b": -0.065
+        "macd": -24.9068,
+        "macd_sig": -18.0693,
+        "macd_hist": -6.8376,
+        "sma20": 6651.08,
+        "bb_upper": 6713.53,
+        "bb_lower": 6588.64,
+        "bb_pct_b": 0.014
       }
     }
   },
   "oil": {
     "Brent": {
       "dates": [
-        "Mar 18 23:00",
-        "Mar 18 23:15",
-        "Mar 18 23:30",
-        "Mar 18 23:45",
         "Mar 19 00:00",
         "Mar 19 00:15",
         "Mar 19 00:30",
@@ -1612,13 +1608,13 @@
         "Mar 19 08:00",
         "Mar 19 08:15",
         "Mar 19 08:30",
-        "Mar 19 08:45"
+        "Mar 19 08:45",
+        "Mar 19 09:00",
+        "Mar 19 09:15",
+        "Mar 19 09:30",
+        "Mar 19 09:45"
       ],
       "prices": [
-        106.18,
-        105.9,
-        106.1,
-        106.48,
         106.83,
         106.82,
         106.84,
@@ -1654,17 +1650,17 @@
         107.19,
         107.1,
         107.01,
-        106.94
+        106.71,
+        106.61,
+        106.46,
+        105.85,
+        105.58
       ],
-      "current": 106.94,
+      "current": 105.58,
       "start": 70.93
     },
     "WTI": {
       "dates": [
-        "Mar 18 23:00",
-        "Mar 18 23:15",
-        "Mar 18 23:30",
-        "Mar 18 23:45",
         "Mar 19 00:00",
         "Mar 19 00:15",
         "Mar 19 00:30",
@@ -1700,13 +1696,13 @@
         "Mar 19 08:00",
         "Mar 19 08:15",
         "Mar 19 08:30",
-        "Mar 19 08:45"
+        "Mar 19 08:45",
+        "Mar 19 09:00",
+        "Mar 19 09:15",
+        "Mar 19 09:30",
+        "Mar 19 09:45"
       ],
       "prices": [
-        96.07,
-        95.97,
-        96.36,
-        96.37,
         96.52,
         96.59,
         96.6,
@@ -1742,34 +1738,38 @@
         96.34,
         96.18,
         95.86,
-        95.88
+        96.29,
+        96.45,
+        96.65,
+        96.63,
+        96.29
       ],
-      "current": 95.88,
+      "current": 96.29,
       "start": 65.4
     }
   },
   "macro": {
     "VIX": {
-      "current": 26.84,
+      "current": 25.87,
       "unit": ""
     },
     "10Y Yield": {
-      "current": 4.31,
+      "current": 4.28,
       "unit": "%"
     }
   },
   "news": [
     {
+      "title": "Gas price soars 25% after strikes on Qatar hub",
+      "source": "BBC World",
+      "url": "https://www.bbc.com/news/articles/c78x83lpgngo?at_medium=RSS&at_campaign=rss",
+      "time": "Thu, 19 Mar 2026 13:58"
+    },
+    {
       "title": "Three Palestinian women killed during Iranian missile attack",
       "source": "BBC World",
       "url": "https://www.bbc.com/news/articles/c0ljl23plpzo?at_medium=RSS&at_campaign=rss",
       "time": "Thu, 19 Mar 2026 12:32"
-    },
-    {
-      "title": "Gas price soars 25% after strikes on Qatar hub",
-      "source": "BBC World",
-      "url": "https://www.bbc.com/news/articles/c78x83lpgngo?at_medium=RSS&at_campaign=rss",
-      "time": "Thu, 19 Mar 2026 11:46"
     },
     {
       "title": "Japan PM to hold 'difficult' talks with Trump as Iran conflict looms large",
